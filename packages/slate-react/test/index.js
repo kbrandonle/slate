@@ -1,41 +1,14 @@
-import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { Editor } from 'slate'
-import { ReactEditor } from 'slate-react'
 
 describe('slate-react', () => {
-  fixtures(__dirname, 'interfaces', ({ module }) => {
+  fixtures(__dirname, 'selection', ({ module }) => {
     let { input, test, output } = module
     if (Editor.isEditor(input)) {
       input = withTest(input)
     }
     const result = test(input)
-    assert.deepEqual(result, output)
-  })
-  fixtures(__dirname, 'operations', ({ module }) => {
-    const { input, operations, output } = module
-    const editor = withTest(input)
-    Editor.withoutNormalizing(editor, () => {
-      for (const op of operations) {
-        editor.apply(op)
-      }
-    })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-  fixtures(__dirname, 'normalization', ({ module }) => {
-    const { input, output } = module
-    const editor = withTest(input)
-    Editor.normalize(editor, { force: true })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-  fixtures(__dirname, 'transforms', ({ module }) => {
-    const { input, run, output } = module
-    const editor = withTest(input)
-    run(editor)
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
+    expect(result).toEqual(output)
   })
 })
 const withTest = editor => {
@@ -48,9 +21,3 @@ const withTest = editor => {
   }
   return editor
 }
-export const jsx = createHyperscript({
-  elements: {
-    block: {},
-    inline: { inline: true },
-  },
-})
