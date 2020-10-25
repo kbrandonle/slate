@@ -1,5 +1,4 @@
 /** @jsx jsx */
-
 import { ReactEditor } from 'slate-react'
 import { jsx } from '../..'
 
