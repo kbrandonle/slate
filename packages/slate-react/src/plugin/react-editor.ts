@@ -513,7 +513,7 @@ export const ReactEditor = {
       )
     }
 
-    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
@@ -525,9 +525,14 @@ export const ReactEditor = {
       anchorNode.nodeValue != null &&
       anchorNode.nodeValue.length === anchorOffset
     ) {
-      // move anchor to the start of the next node.
-      anchor.path = Path.next(anchor.path);
-      anchor.offset = 0;
+      // Get the next node
+      const newNodeEntry = Editor.next(editor, { at: anchor.path })
+
+      // If there is a next node, move anchor to the start of the next node
+      if (newNodeEntry) {
+        anchor.path = newNodeEntry[1]
+        anchor.offset = 0
+      }
     }
 
     return { anchor, focus }
