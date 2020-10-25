@@ -36,6 +36,7 @@
     "@babel/preset-typescript": "^7.7.4",
     "@babel/register": "^7.7.4",
     "@babel/runtime": "^7.7.4",
+    "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.14",
@@ -86,7 +87,6 @@
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
     "ts-jest": "^26.4.2",
-    "ts-sinon": "^2.0.1",
     "typescript": "^3.7.2"
   }
 }
