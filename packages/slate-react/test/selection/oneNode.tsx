@@ -1,40 +1,18 @@
 /** @jsx jsx */
 import { Point } from 'slate'
-import { Editor } from 'slate'
-import { ReactEditor } from 'slate-react'
-import { stubObject } from 'ts-sinon'
-import { jsx } from '../..'
+import { ReactEditor } from '../../src/plugin/react-editor'
+import { stubInterface, stubConstructor } from 'ts-sinon'
 
-export const input = (
-  <editor>
-    <block>one</block>
-    <block>two</block>
-    <block>three</block>
-  </editor>
-)
+let mockNode = stubInterface<Point>()
+let mockReactEditor = stubInterface<ReactEditor>()
+
+
+export const input = {
+  
+}
 
 export const test = editor => {
-  ReactEditor.toSlatePoint: (editor: Editor, domPoint: DOMPoint) => {
-    let point: Point;
-    if (domPoint[0].nodeValue == 'one') {
-      point.offset = domPoint[1],
-        point.path = [0]
-    } else if (domPoint[0].nodeValue == 'two') {
-      point.offset = domPoint[1],
-        point.path = [1]
-    } else if (domPoint[0].nodeValue == 'three') {
-      point.offset = domPoint[1],
-        point.path = [2]
-    } else {
-      point.offset = -1,
-        point.path = [-1]
-    }
-    return point
-  }
-  return ReactEditor.toSlateRange(editor, {
-    anchorNode: {}
-
-  })
+  mockReactEditor.toSlatePoint.
 }
 
 export const output = {
