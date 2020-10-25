@@ -85,6 +85,7 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
+    "ts-sinon": "^2.0.1",
     "typescript": "^3.7.2"
   }
 }
