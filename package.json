@@ -91,5 +91,7 @@
     "ts-jest": "^26.4.2",
     "typescript": "^3.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
 }

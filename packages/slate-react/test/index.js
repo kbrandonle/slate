@@ -1,5 +1,6 @@
 import { fixtures } from '../../../support/fixtures'
 import { Editor } from 'slate'
+import { isImageUrl, nonAsyncIsHeaderImage } from './imageexample/images'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
@@ -9,6 +10,20 @@ describe('slate-react', () => {
     }
     const result = test(input)
     expect(result).toEqual(output)
+  })
+
+  //tests is image url function
+  fixtures(__dirname, 'imageurls', ({ module }) => {
+    let { input, imageUrl } = module
+  
+    expect(isImageUrl(input)).toEqual(imageUrl)
+  })
+
+  //tests is header image function
+  fixtures(__dirname, 'imageurls', ({ module }) => {
+    let { input, headerImage } = module
+  
+    expect(nonAsyncIsHeaderImage(input)).toEqual(headerImage)
   })
 })
 const withTest = editor => {
