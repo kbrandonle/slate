@@ -3,6 +3,7 @@ import { ReactEditor } from '../src/plugin/react-editor'
 import { DOMSelection } from '../src/utils/dom'
 import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
+import * as domDependency from '../src/utils/dom'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
@@ -19,7 +20,7 @@ describe('slate-react', () => {
     // Assert
     expect(result).toEqual(output)
   })
-  fixtures(__dirname, 'point', ({module}) => {
+  fixtures(__dirname, 'point', ({ module }) => {
     // Arrange
     const { selection, slateRangeSelection, nextNodeEntry, output } = module
 
@@ -35,9 +36,23 @@ describe('slate-react', () => {
   })
 })
 
-const testToSlatePoint = () => {
-  // https://stackoverflow.com/questions/40465047/how-can-i-mock-an-es6-module-import-using-jest
+const testToSlatePoint = (
+) => {
+  // Create our mocks
   const mockEditor = mock<ReactEditor>()
+  const mockNearestNode = mock<Node>()
+  const mockParentNode = mock<Node>()
+  jest.spyOn(mockNearestNode, 'parentNode', 'get').mockReturnValue(mockParentNode)
+
+  const nearestDOMPoint = [
+
+    0 // placeholder for offset
+  ]
+
+  // Mock dependencies
+  jest.mock('../src/utils/dom', () => ({
+    normalizeDOMPoint: jest.fn().mockReturnValue(nearestDOMPoint)
+  }))
 
   ReactEditor.toSlateNode = jest.fn()
   ReactEditor.findPath = jest.fn()
