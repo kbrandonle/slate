@@ -1,7 +1,7 @@
 import { fixtures } from '../../../support/fixtures'
 import { ReactEditor } from '../src/plugin/react-editor'
-import { DOMSelection } from '../src/utils/dom'
-import { SlateRange } from 'slate'
+import { DOMSelection, DOMElement } from '../src/utils/dom'
+import { SlateRange, SlateNode } from 'slate'
 import { mock } from 'jest-mock-extended'
 import * as domDependency from '../src/utils/dom'
 
@@ -20,15 +20,13 @@ describe('slate-react', () => {
     // Assert
     expect(result).toEqual(output)
   })
-  fixtures(__dirname, 'point', ({ module }) => {
+  fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { selection, slateRangeSelection, nextNodeEntry, output } = module
+    const { nearestDOMPoint, output } = module
 
     // Act
-    const result = testToSlateRange(
-      selection,
-      slateRangeSelection,
-      nextNodeEntry
+    const result = testToSlatePoint(
+      nearestDOMPoint
     )
 
     // Assert
@@ -37,24 +35,23 @@ describe('slate-react', () => {
 })
 
 const testToSlatePoint = (
+  nearestDOMPoint: [Node, Number]
 ) => {
-  // Create our mocks
+  // Create mock editor
   const mockEditor = mock<ReactEditor>()
-  const mockNearestNode = mock<Node>()
-  const mockParentNode = mock<Node>()
-  jest.spyOn(mockNearestNode, 'parentNode', 'get').mockReturnValue(mockParentNode)
-
-  const nearestDOMPoint = [
-
-    0 // placeholder for offset
-  ]
 
   // Mock dependencies
   jest.mock('../src/utils/dom', () => ({
-    normalizeDOMPoint: jest.fn().mockReturnValue(nearestDOMPoint)
+    normalizeDOMPoint: jest
+      .fn()
+      .mockReturnValue(nearestDOMPoint)
   }))
 
-  ReactEditor.toSlateNode = jest.fn()
+  ReactEditor.toSlateNode = jest
+    .fn()
+    .mockReturnValue(mock<SlateNode>())
+
+  // basically we want this to mock the textNode that we found ising the rest of the code
   ReactEditor.findPath = jest.fn()
 }
 
