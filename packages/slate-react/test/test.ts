@@ -1,41 +1,52 @@
 import { fixtures } from '../../../support/fixtures'
 import { ReactEditor } from '../src/plugin/react-editor'
-import { DOMSelection, DOMElement } from '../src/utils/dom'
+import { DOMSelection, DOMElement, DOMPoint } from '../src/utils/dom'
 import { SlateRange, SlateNode } from 'slate'
 import { mock } from 'jest-mock-extended'
 import * as domDependency from '../src/utils/dom'
+import { exception } from 'console'
 
 describe('slate-react', () => {
-  fixtures(__dirname, 'selection', ({ module }) => {
-    // Arrange
-    const { selection, slateRangeSelection, nextNodeEntry, output } = module
+  // fixtures(__dirname, 'selection', ({ module }) => {
+  //   // Arrange
+  //   const { selection, slateRangeSelection, nextNodeEntry, output } = module
 
-    // Act
-    const result = testToSlateRange(
-      selection,
-      slateRangeSelection,
-      nextNodeEntry
-    )
+  //   // Act
+  //   const result = testToSlateRange(
+  //     selection,
+  //     slateRangeSelection,
+  //     nextNodeEntry
+  //   )
 
-    // Assert
-    expect(result).toEqual(output)
-  })
+  //   // Assert
+  //   expect(result).toEqual(output)
+  // })
   fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { nearestDOMPoint, output } = module
+    const { mockNearestDOMPoint, domPoint, output, exception } = module
 
-    // Act
-    const result = testToSlatePoint(
-      nearestDOMPoint
-    )
+    // Different test case for exceptions
+    if (exception) {
+      // Assert
+      expect(
+        // Act in an arrow method so the expect can catch the exception
+        () => {
+          console.log(testToSlatePoint(mockNearestDOMPoint, domPoint))
+        }
+      ).toThrow(exception)
+    } else {
+      // Act
+      const result = testToSlatePoint(mockNearestDOMPoint, domPoint)
 
-    // Assert
-    expect(result).toEqual(output)
+      // Assert
+      expect(result).toEqual(output)
+    }
   })
 })
 
 const testToSlatePoint = (
-  nearestDOMPoint: [Node, Number]
+  mockNearestDOMPoint: [Node, Number], 
+  domPoint: DOMPoint
 ) => {
   // Create mock editor
   const mockEditor = mock<ReactEditor>()
@@ -44,7 +55,7 @@ const testToSlatePoint = (
   jest.mock('../src/utils/dom', () => ({
     normalizeDOMPoint: jest
       .fn()
-      .mockReturnValue(nearestDOMPoint)
+      .mockReturnValue(mockNearestDOMPoint)
   }))
 
   ReactEditor.toSlateNode = jest
@@ -52,7 +63,9 @@ const testToSlatePoint = (
     .mockReturnValue(mock<SlateNode>())
 
   // basically we want this to mock the textNode that we found ising the rest of the code
-  ReactEditor.findPath = jest.fn()
+  ReactEditor.findPath = jest.fn().mockReturnValue("test")
+
+  return ReactEditor.toSlatePoint(mockEditor, domPoint)
 }
 
 const testToSlateRange = (

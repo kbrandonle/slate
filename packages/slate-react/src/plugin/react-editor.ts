@@ -463,6 +463,8 @@ export const ReactEditor = {
       }
     }
 
+    console.log(parentNode, textNode)
+
     if (!textNode) {
       throw new Error(
         `Cannot resolve a Slate point from DOM point: ${domPoint}`

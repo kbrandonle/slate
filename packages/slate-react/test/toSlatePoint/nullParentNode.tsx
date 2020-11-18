@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { fixtures } from '../../../../support/fixtures'
 import { ReactEditor } from '../../src/plugin/react-editor'
-import { DOMSelection, DOMElement } from '../../src/utils/dom'
+import { DOMPoint, DOMElement } from '../../src/utils/dom'
 import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 import * as domDependency from '../../src/utils/dom'
@@ -45,12 +45,20 @@ const mockquerySelectorAllFn = jest.fn((input: string) => {
   }
 })
 
+// mocking workaround for nearest node non-static property
+Object.defineProperty(mockNearestNode, 'parentNode', { get() { return null; } });
 
-jest
-  .spyOn(mockNearestNode, 'parentNode', 'get')
-  .mockReturnValue(mockParentNode)
+// jest
+//   .spyOn(mockNearestNode, 'parentNode')
+//   .mockReturnValue(null) // mock to return null as parent node.
 
-export const nearestDOMPoint = [
+export const domPoint = mock<DOMPoint>()
+// [
+//   mock<Node>(), // Placeholder for node
+//   0 // placeholder for offset
+// ]
+
+export const mockNearestDOMPoint = [
   mockNearestNode, // Mock object that we attached all our functions to
   0
 ]
@@ -59,3 +67,6 @@ export const output = [
   mock<Node>(), // Placeholder for node
   0 // placeholder for offset
 ]
+
+// We expect this code to throw an error
+export const exception = new Error(`Cannot resolve a Slate point from DOM point: ${domPoint}`);
