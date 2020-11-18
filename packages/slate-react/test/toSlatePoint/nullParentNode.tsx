@@ -5,6 +5,7 @@ import { DOMPoint, DOMElement } from '../../src/utils/dom'
 import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 import * as domDependency from '../../src/utils/dom'
+import { testToSlatePoint } from '../test'
 
 // Create our mocks
 const mockNearestNode = mock<Node>()
@@ -70,3 +71,6 @@ export const output = [
 
 // We expect this code to throw an error
 export const exception = new Error(`Cannot resolve a Slate point from DOM point: ${domPoint}`);
+
+// export the test scoped to this file, so our mocks don't affect the other tests
+export const test = testToSlatePoint

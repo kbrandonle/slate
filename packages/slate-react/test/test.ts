@@ -7,23 +7,23 @@ import * as domDependency from '../src/utils/dom'
 import { exception } from 'console'
 
 describe('slate-react', () => {
-  // fixtures(__dirname, 'selection', ({ module }) => {
-  //   // Arrange
-  //   const { selection, slateRangeSelection, nextNodeEntry, output } = module
+  fixtures(__dirname, 'selection', ({ module }) => {
+    // Arrange
+    const { selection, slateRangeSelection, nextNodeEntry, output, test } = module
 
-  //   // Act
-  //   const result = testToSlateRange(
-  //     selection,
-  //     slateRangeSelection,
-  //     nextNodeEntry
-  //   )
+    // Act
+    const result = test(
+      selection,
+      slateRangeSelection,
+      nextNodeEntry
+    )
 
-  //   // Assert
-  //   expect(result).toEqual(output)
-  // })
+    // Assert
+    expect(result).toEqual(output)
+  })
   fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { mockNearestDOMPoint, domPoint, output, exception } = module
+    const { mockNearestDOMPoint, domPoint, output, exception, test } = module
 
     // Different test case for exceptions
     if (exception) {
@@ -31,12 +31,12 @@ describe('slate-react', () => {
       expect(
         // Act in an arrow method so the expect can catch the exception
         () => {
-          console.log(testToSlatePoint(mockNearestDOMPoint, domPoint))
+          test(mockNearestDOMPoint, domPoint)
         }
       ).toThrow(exception)
     } else {
       // Act
-      const result = testToSlatePoint(mockNearestDOMPoint, domPoint)
+      const result = test(mockNearestDOMPoint, domPoint)
 
       // Assert
       expect(result).toEqual(output)
@@ -44,31 +44,46 @@ describe('slate-react', () => {
   })
 })
 
-const testToSlatePoint = (
-  mockNearestDOMPoint: [Node, Number], 
+export const testToSlatePoint = (
+  mockNearestDOMPoint: [Node, Number],
   domPoint: DOMPoint
 ) => {
   // Create mock editor
   const mockEditor = mock<ReactEditor>()
 
-  // Mock dependencies
-  jest.mock('../src/utils/dom', () => ({
-    normalizeDOMPoint: jest
-      .fn()
-      .mockReturnValue(mockNearestDOMPoint)
-  }))
-
-  ReactEditor.toSlateNode = jest
+  // Mock toslateNode to at least return something
+  const mockToSlateNode = jest
     .fn()
-    .mockReturnValue(mock<SlateNode>())
+    .mockImplementation(() => mock<SlateNode>())
 
   // basically we want this to mock the textNode that we found ising the rest of the code
-  ReactEditor.findPath = jest.fn().mockReturnValue("test")
+  const mockFindPath = jest.fn().mockReturnValue("test")
 
-  return ReactEditor.toSlatePoint(mockEditor, domPoint)
+  // mock normalizeDOMPoint to return the value we recieve
+  const mockNormalizeDOMPoint = jest
+    .fn()
+    .mockReturnValue(mockNearestDOMPoint)
+
+  // Save a refereance to the original functions
+  const originalToSlateNode = ReactEditor.toSlateNode
+  const originalFindPath = ReactEditor.findPath
+  const originalNormalizeDOMPoint = ReactEditor.normalizeDOMPoint
+
+  // replace implementations with mocked functions
+  ReactEditor.toSlateNode = mockToSlateNode
+  ReactEditor.findPath = mockFindPath
+  ReactEditor.normalizeDOMPoint = mockNormalizeDOMPoint
+
+  // Evaluate test function
+  const returnVal = ReactEditor.toSlatePoint(mockEditor, domPoint)
+
+  // replace implementations with original functions
+  ReactEditor.toSlateNode = originalToSlateNode
+  ReactEditor.findPath = originalFindPath
+  ReactEditor.normalizeDOMPoint = originalNormalizeDOMPoint
 }
 
-const testToSlateRange = (
+export const testToSlateRange = (
   inputSelection: DOMSelection,
   inputSlateRangeSelection: SlateRange,
   nextNodeEntry: number[] | undefined
@@ -90,10 +105,23 @@ const testToSlateRange = (
 
   const mockEditor = mock<ReactEditor>()
 
+  // Save a refereance to the original functions
+  const originalToSlatePoint = ReactEditor.toSlatePoint
+  const originalDomRangeToSlateRangeDescription = ReactEditor.domRangeToSlateRangeDescription
+  const originalNext = ReactEditor.next
+
   // replace dependancies with mocked implementations
   ReactEditor.toSlatePoint = mockToSlatePoint
   ReactEditor.domRangeToSlateRangeDescription = mockDomRangeToSlateRangeDescription
   ReactEditor.next = mockNextNode
 
-  return ReactEditor.toSlateRange(mockEditor, inputSelection)
+  // evaluate function
+  const returnVal = ReactEditor.toSlateRange(mockEditor, inputSelection)
+
+  // Replace dependencies with their original function references
+  ReactEditor.toSlatePoint = originalToSlatePoint
+  ReactEditor.domRangeToSlateRangeDescription = originalDomRangeToSlateRangeDescription
+  ReactEditor.next = originalNext
+
+  return returnVal
 }

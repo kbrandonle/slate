@@ -405,7 +405,7 @@ export const ReactEditor = {
    */
 
   toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
-    const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
+    const [nearestNode, nearestOffset] = ReactEditor.normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
     let offset = 0
@@ -462,8 +462,6 @@ export const ReactEditor = {
         offset--
       }
     }
-
-    console.log(parentNode, textNode)
 
     if (!textNode) {
       throw new Error(
@@ -571,5 +569,6 @@ export const ReactEditor = {
 
     return { anchor, focus }
   },
+  normalizeDOMPoint,
   ...Editor,
 }
