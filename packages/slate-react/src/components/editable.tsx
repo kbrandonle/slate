@@ -44,6 +44,7 @@ import {
 } from '../utils/weak-maps'
 
 import { handleClickEvent } from '../events/click-event'
+import { handleCopyEvent } from '../events/copy-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -626,13 +627,13 @@ export const Editable = (props: EditableProps) => {
         )}
         onCopy={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCopy)
-            ) {
-              event.preventDefault()
-              ReactEditor.setFragmentData(editor, event.clipboardData)
-            }
+            handleCopyEvent({
+              editor : editor, 
+              hasEditableTarget : hasEditableTarget, 
+              isEventHandled : isEventHandled,
+              attributes : attributes, 
+              event : event
+            })
           },
           [attributes.onCopy]
         )}

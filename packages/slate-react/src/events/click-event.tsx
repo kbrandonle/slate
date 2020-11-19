@@ -23,8 +23,6 @@ export function handleClickEvent(props: any) {
             props.Path.equals(startVoid[1], endVoid[1])) {
             const range = props.Editor.range(reactEditor, start)
             props.Transforms.select(reactEditor, range)
-  
-            console.log('SELECTED VOID NODE')
       }
     }
   }
