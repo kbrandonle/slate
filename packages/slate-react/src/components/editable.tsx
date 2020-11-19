@@ -46,6 +46,7 @@ import {
 import { handleClickEvent } from '../events/click-event'
 import { handleCopyEvent } from '../events/copy-event'
 import { handleCutEvent } from '../events/cut-event'
+import { handlePasteEvent } from '../events/paste-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -944,23 +945,18 @@ export const Editable = (props: EditableProps) => {
           },
           [readOnly, attributes.onKeyDown]
         )}
-        onPaste={useCallback(
-          (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's `onPaste` here instead.
-            // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
-            // when "paste without formatting" option is used.
-            // This unfortunately needs to be handled with paste events instead.
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste) &&
-              (!HAS_BEFORE_INPUT_SUPPORT ||
-                isPlainTextOnlyPaste(event.nativeEvent)) &&
-              !readOnly
-            ) {
-              event.preventDefault()
-              ReactEditor.insertData(editor, event.clipboardData)
-            }
+         onPaste={useCallback(
+           (event: React.ClipboardEvent<HTMLDivElement>) => {
+            handlePasteEvent({
+              editor : editor,
+              event : event, 
+              hasEditableTarget : hasEditableTarget, 
+              isEventHandled : isEventHandled,
+              isPlainTextOnlyPaste : isPlainTextOnlyPaste,
+              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT, 
+              readOnly : readOnly,
+              attributes : attributes
+            })
           },
           [readOnly, attributes.onPaste]
         )}

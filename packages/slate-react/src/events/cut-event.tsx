@@ -19,8 +19,6 @@ export function handleCutEvent(props : any) {
     
         if (selection && SlateRange.isExpanded(selection)) {
           Editor.deleteFragment(editor)
-
-          console.log("CUT EVENT")
         }
       }
 }
