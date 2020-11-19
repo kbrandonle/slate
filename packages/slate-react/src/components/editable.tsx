@@ -43,6 +43,8 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 
+import { handleClickEvent } from '../events/click-event'
+
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
 const HAS_BEFORE_INPUT_SUPPORT = !(
@@ -577,30 +579,19 @@ export const Editable = (props: EditableProps) => {
         )}
         onClick={useCallback(
           (event: React.MouseEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              hasTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onClick) &&
-              isDOMNode(event.target)
-            ) {
-              const node = ReactEditor.toSlateNode(editor, event.target)
-              const path = ReactEditor.findPath(editor, node)
-              const start = Editor.start(editor, path)
-              const end = Editor.end(editor, path)
-
-              const startVoid = Editor.void(editor, { at: start })
-              const endVoid = Editor.void(editor, { at: end })
-
-              if (
-                startVoid &&
-                endVoid &&
-                Path.equals(startVoid[1], endVoid[1])
-              ) {
-                const range = Editor.range(editor, start)
-                Transforms.select(editor, range)
-              }
-            }
-          },
+            handleClickEvent({
+              readOnly: readOnly,
+              editor: editor,
+              ReactEditor: ReactEditor,
+              event: event,
+              isEventHandled: isEventHandled,
+              hasTarget: hasTarget,
+              isDOMNode: isDOMNode,
+              Editor: Editor,
+              Path: Path,
+              Transforms: Transforms,
+              attributes: attributes})
+            },
           [readOnly, attributes.onClick]
         )}
         onCompositionEnd={useCallback(
