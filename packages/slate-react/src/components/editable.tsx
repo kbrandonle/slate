@@ -45,6 +45,7 @@ import {
 
 import { handleClickEvent } from '../events/click-event'
 import { handleCopyEvent } from '../events/copy-event'
+import { handleCutEvent } from '../events/cut-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -639,19 +640,14 @@ export const Editable = (props: EditableProps) => {
         )}
         onCut={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCut)
-            ) {
-              event.preventDefault()
-              ReactEditor.setFragmentData(editor, event.clipboardData)
-              const { selection } = editor
-
-              if (selection && SlateRange.isExpanded(selection)) {
-                Editor.deleteFragment(editor)
-              }
-            }
+            handleCutEvent({
+              editor: editor,
+              event : event, 
+              readOnly : readOnly, 
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              attributes: attributes
+            })
           },
           [readOnly, attributes.onCut]
         )}
