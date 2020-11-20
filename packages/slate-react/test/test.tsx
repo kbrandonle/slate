@@ -5,7 +5,7 @@ import { DOMSelection, DOMNode, SlateRangeDescription } from 'slate-react/src/ut
 import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 import ReactDOM from "react-dom";
-import ImagesExample, { getSelectionEditor } from 'slate-react/test/editor/sample-editor'
+import EditorExample, { getSelectionEditor } from 'slate-react/test/editor/sample-editor'
 import { act } from 'react-dom/test-utils';
 
 describe('slate-react', () => {
@@ -64,7 +64,7 @@ describe('slate-react', () => {
     document.body.appendChild(tree)
 
     act(() => {
-      ReactDOM.render(<ImagesExample/>, tree)
+      ReactDOM.render(<EditorExample/>, tree)
     })
 
     // selection should be null at init

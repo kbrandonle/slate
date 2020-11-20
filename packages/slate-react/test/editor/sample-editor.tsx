@@ -12,7 +12,7 @@ import { withHistory } from 'slate-history'
 
 var selectionEditor = null
 
-const ImagesExample = () => { // take in a initial value to test. 
+const EditorExample = () => { // take in a initial value to test. 
     const [value, setValue] = useState<SlateNode[]>(initialValue) // initial value can be set here
     const editor = useMemo(
       () => withImages(withHistory(withReact(createEditor()))),
@@ -333,4 +333,4 @@ const initialValue = [
   },
 ]
 
-export default ImagesExample;
+export default EditorExample;
