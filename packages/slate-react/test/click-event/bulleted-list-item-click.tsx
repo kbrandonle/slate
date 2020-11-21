@@ -1,3 +1,7 @@
+export const input = [{
+    type: 'bulleted-list',
+    children: [{ text: 'List 1' }],
+  },]
 
 export const selector = "ul"
 

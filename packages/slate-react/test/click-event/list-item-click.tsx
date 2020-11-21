@@ -1,3 +1,7 @@
+export const input = [{
+    type: 'list-item',
+    children: [{ text: 'Item 1' }],
+  },]
 
 export const selector = "li"
 

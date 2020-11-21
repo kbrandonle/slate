@@ -1,3 +1,8 @@
+export const input = [{
+    type: 'image',
+    url: 'https://source.unsplash.com/kFrdX5IeQzI',
+    children: [{ text: '' }],
+  },]
 
 export const selector = "img"
 

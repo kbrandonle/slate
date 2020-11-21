@@ -12,8 +12,8 @@ import { withHistory } from 'slate-history'
 
 var selectionEditor = null
 
-const EditorExample = () => { // take in a initial value to test. 
-    const [value, setValue] = useState<SlateNode[]>(initialValue) // initial value can be set here
+const EditorExample = (props) => { // take in a initial value to test. 
+    const [value, setValue] = useState<SlateNode[]>(props.initValue) // initial value can be set here
     const editor = useMemo(
       () => withImages(withHistory(withReact(createEditor()))),
       []
@@ -202,135 +202,5 @@ const insertImage = (editor, url) => {
     const image = { type: 'image', url, children: [text] }
     Transforms.insertNodes(editor, image)
 }
-
-// mock initial value, replace with actual value
-const initialValue = [
-  {
-    type: 'image',
-    url: 'https://source.unsplash.com/kFrdX5IeQzI',
-    children: [{ text: '' }],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text:
-          'In addition to nodes that contain editable text, you can insert void nodes, which can also contain editable elements, inputs, or an entire other Slate editor.',
-      },
-    ],
-  },
-  {
-    type: 'editable-void',
-    children: [{ text: '' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Criss-cross!' }],
-  },
-  {
-    type: 'title',
-    children: [{ text: 'Enforce Your Layout!' }],
-  },
-  {
-    type: 'video',
-    url: 'https://player.vimeo.com/video/26689853',
-    children: [{ text: '' }],
-  },
-  {
-    type: 'link',
-    url: 'https://en.wikipedia.org/wiki/Hypertext',
-    children: [{ text: 'hyperlinks' }],
-  },
-  {
-    type: 'block-quote',
-    children: [{ text: 'A wise quote.' }],
-  },
-  {
-    type: 'heading-two',
-    children: [{ text: 'Try it out!' }],
-  },
-  {
-    type: 'list-item',
-    children: [{ text: 'Item 1' }],
-  },
-  {
-    type: 'bulleted-list',
-    children: [{ text: 'List 1' }],
-  },
-  {
-    type: 'mention',
-    character: 'Mace Windu',
-    children: [{ text: '' }],
-  },
-  {
-    type: 'table',
-    children: [
-      {
-        type: 'table-row',
-        children: [
-          {
-            type: 'table-cell',
-            children: [{ text: '' }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: 'Human', bold: true }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: 'Dog', bold: true }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: 'Cat', bold: true }],
-          },
-        ],
-      },
-      {
-        type: 'table-row',
-        children: [
-          {
-            type: 'table-cell',
-            children: [{ text: '# of Feet', bold: true }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '2' }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '4' }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '4' }],
-          },
-        ],
-      },
-      {
-        type: 'table-row',
-        children: [
-          {
-            type: 'table-cell',
-            children: [{ text: '# of Lives', bold: true }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '1' }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '1' }],
-          },
-          {
-            type: 'table-cell',
-            children: [{ text: '9' }],
-          },
-        ],
-      },
-    ],
-  },
-]
 
 export default EditorExample;

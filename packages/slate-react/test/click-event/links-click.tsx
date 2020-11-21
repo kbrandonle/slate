@@ -1,3 +1,8 @@
+export const input = [{
+    type: 'link',
+    url: 'https://en.wikipedia.org/wiki/Hypertext',
+    children: [{ text: 'hyperlinks' }],
+  },]
 
 export const selector = "a"
 

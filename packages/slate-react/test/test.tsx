@@ -58,13 +58,13 @@ const testToSlateRange = (
 describe('slate-react', () => {
   fixtures(__dirname, 'click-event', ({ module }) => {
 
-    const {selector, output} = module
+    const {selector, output, input} = module
 
     var tree = document.createElement('div')
     document.body.appendChild(tree)
 
-    act(() => {
-      ReactDOM.render(<EditorExample/>, tree)
+    act(() => { // TODO: Refactor the whole click-event branch to export input, instead of having already filled input in sample editor
+      ReactDOM.render(<EditorExample initValue={input}/>, tree)
     })
 
     // selection should be null at init

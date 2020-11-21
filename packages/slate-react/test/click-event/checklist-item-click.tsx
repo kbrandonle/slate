@@ -1,3 +1,8 @@
+export const input = [{
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Criss-cross!' }],
+  },]
 
 export const selector = "p"
 

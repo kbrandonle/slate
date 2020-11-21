@@ -1,3 +1,7 @@
+export const input = [{
+    type: 'heading-two',
+    children: [{ text: 'Try it out!' }],
+  },]
 
 export const selector = "h2"
 

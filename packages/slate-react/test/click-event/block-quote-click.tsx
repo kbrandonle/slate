@@ -1,3 +1,7 @@
+export const input = [{
+    type: 'block-quote',
+    children: [{ text: 'A wise quote.' }],
+  },]
 
 export const selector = "blockquote"
 
