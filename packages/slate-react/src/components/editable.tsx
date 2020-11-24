@@ -47,6 +47,8 @@ import { handleClickEvent } from '../events/click-event'
 import { handleCopyEvent } from '../events/copy-event'
 import { handleCutEvent } from '../events/cut-event'
 import { handlePasteEvent } from '../events/paste-event'
+import { handleKeyDownEvent } from '../events/key-down-event'
+import { handleOnBlurEvent } from '../events/blur-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -525,58 +527,18 @@ export const Editable = (props: EditableProps) => {
         )}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
-            if (
-              readOnly ||
-              state.isUpdatingSelection ||
-              !hasEditableTarget(editor, event.target) ||
-              isEventHandled(event, attributes.onBlur)
-            ) {
-              return
-            }
-
-            // COMPAT: If the current `activeElement` is still the previous
-            // one, this is due to the window being blurred when the tab
-            // itself becomes unfocused, so we want to abort early to allow to
-            // editor to stay focused when the tab becomes focused again.
-            if (state.latestElement === window.document.activeElement) {
-              return
-            }
-
-            const { relatedTarget } = event
-            const el = ReactEditor.toDOMNode(editor, editor)
-
-            // COMPAT: The event should be ignored if the focus is returning
-            // to the editor from an embedded editable element (eg. an <input>
-            // element inside a void node).
-            if (relatedTarget === el) {
-              return
-            }
-
-            // COMPAT: The event should be ignored if the focus is moving from
-            // the editor to inside a void node's spacer element.
-            if (
-              isDOMElement(relatedTarget) &&
-              relatedTarget.hasAttribute('data-slate-spacer')
-            ) {
-              return
-            }
-
-            // COMPAT: The event should be ignored if the focus is moving to a
-            // non- editable section of an element that isn't a void node (eg.
-            // a list item of the check list example).
-            if (
-              relatedTarget != null &&
-              isDOMNode(relatedTarget) &&
-              ReactEditor.hasDOMNode(editor, relatedTarget)
-            ) {
-              const node = ReactEditor.toSlateNode(editor, relatedTarget)
-
-              if (Element.isElement(node) && !editor.isVoid(node)) {
-                return
-              }
-            }
-
-            IS_FOCUSED.delete(editor)
+             handleOnBlurEvent({
+              event : event,
+              editor : editor, 
+              state : state, 
+              readOnly : readOnly,
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              isDOMElement : isDOMElement,
+              isDOMNode : isDOMNode,
+              attributes : attributes,
+              IS_FOCUSED : IS_FOCUSED,
+             })
           },
           [readOnly, attributes.onBlur]
         )}
@@ -743,205 +705,14 @@ export const Editable = (props: EditableProps) => {
         )}
         onKeyDown={useCallback(
           (event: React.KeyboardEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onKeyDown)
-            ) {
-              const { nativeEvent } = event
-              const { selection } = editor
-
-              // COMPAT: Since we prevent the default behavior on
-              // `beforeinput` events, the browser doesn't think there's ever
-              // any history stack to undo or redo, so we have to manage these
-              // hotkeys ourselves. (2019/11/06)
-              if (Hotkeys.isRedo(nativeEvent)) {
-                event.preventDefault()
-
-                if (typeof editor.redo === 'function') {
-                  editor.redo()
-                }
-
-                return
-              }
-
-              if (Hotkeys.isUndo(nativeEvent)) {
-                event.preventDefault()
-
-                if (typeof editor.undo === 'function') {
-                  editor.undo()
-                }
-
-                return
-              }
-
-              // COMPAT: Certain browsers don't handle the selection updates
-              // properly. In Chrome, the selection isn't properly extended.
-              // And in Firefox, the selection isn't properly collapsed.
-              // (2017/10/17)
-              if (Hotkeys.isMoveLineBackward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, { unit: 'line', reverse: true })
-                return
-              }
-
-              if (Hotkeys.isMoveLineForward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, { unit: 'line' })
-                return
-              }
-
-              if (Hotkeys.isExtendLineBackward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, {
-                  unit: 'line',
-                  edge: 'focus',
-                  reverse: true,
-                })
-                return
-              }
-
-              if (Hotkeys.isExtendLineForward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, { unit: 'line', edge: 'focus' })
-                return
-              }
-
-              // COMPAT: If a void node is selected, or a zero-width text node
-              // adjacent to an inline is selected, we need to handle these
-              // hotkeys manually because browsers won't be able to skip over
-              // the void node with the zero-width space not being an empty
-              // string.
-              if (Hotkeys.isMoveBackward(nativeEvent)) {
-                event.preventDefault()
-
-                if (selection && SlateRange.isCollapsed(selection)) {
-                  Transforms.move(editor, { reverse: true })
-                } else {
-                  Transforms.collapse(editor, { edge: 'start' })
-                }
-
-                return
-              }
-
-              if (Hotkeys.isMoveForward(nativeEvent)) {
-                event.preventDefault()
-
-                if (selection && SlateRange.isCollapsed(selection)) {
-                  Transforms.move(editor)
-                } else {
-                  Transforms.collapse(editor, { edge: 'end' })
-                }
-
-                return
-              }
-
-              if (Hotkeys.isMoveWordBackward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, { unit: 'word', reverse: true })
-                return
-              }
-
-              if (Hotkeys.isMoveWordForward(nativeEvent)) {
-                event.preventDefault()
-                Transforms.move(editor, { unit: 'word' })
-                return
-              }
-
-              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-              // fall back to guessing at the input intention for hotkeys.
-              // COMPAT: In iOS, some of these hotkeys are handled in the
-              if (!HAS_BEFORE_INPUT_SUPPORT) {
-                // We don't have a core behavior for these, but they change the
-                // DOM if we don't prevent them, so we have to.
-                if (
-                  Hotkeys.isBold(nativeEvent) ||
-                  Hotkeys.isItalic(nativeEvent) ||
-                  Hotkeys.isTransposeCharacter(nativeEvent)
-                ) {
-                  event.preventDefault()
-                  return
-                }
-
-                if (Hotkeys.isSplitBlock(nativeEvent)) {
-                  event.preventDefault()
-                  Editor.insertBreak(editor)
-                  return
-                }
-
-                if (Hotkeys.isDeleteBackward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteBackward(editor)
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isDeleteForward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteForward(editor)
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteBackward(editor, { unit: 'line' })
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isDeleteLineForward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteForward(editor, { unit: 'line' })
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteBackward(editor, { unit: 'word' })
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isDeleteWordForward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && SlateRange.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    Editor.deleteForward(editor, { unit: 'word' })
-                  }
-
-                  return
-                }
-              }
-            }
+            handleKeyDownEvent({
+              editor : editor, 
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              attributes : attributes,
+              event : event,
+              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT
+            })
           },
           [readOnly, attributes.onKeyDown]
         )}
