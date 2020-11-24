@@ -43,12 +43,13 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 
-import { handleClickEvent } from '../events/click-event'
+import { handleClickEvent } from 'slate-react/src/events/mouse-events/click-event'
 import { handleCopyEvent } from '../events/copy-event'
 import { handleCutEvent } from '../events/cut-event'
 import { handlePasteEvent } from '../events/paste-event'
-import { handleKeyDownEvent } from '../events/key-down-event'
+import { handleKeyDownEvent } from 'slate-react/src/events/key-events/key-down-event'
 import { handleOnBlurEvent } from '../events/blur-event'
+import { handleDragStartEvent } from '../events/mouse-events/drag-start-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -634,23 +635,13 @@ export const Editable = (props: EditableProps) => {
         )}
         onDragStart={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onDragStart)
-            ) {
-              const node = ReactEditor.toSlateNode(editor, event.target)
-              const path = ReactEditor.findPath(editor, node)
-              const voidMatch = Editor.void(editor, { at: path })
-
-              // If starting a drag on a void node, make sure it is selected
-              // so that it shows up in the selection's fragment.
-              if (voidMatch) {
-                const range = Editor.range(editor, path)
-                Transforms.select(editor, range)
-              }
-
-              ReactEditor.setFragmentData(editor, event.dataTransfer)
-            }
+            handleDragStartEvent({
+              event : event,
+              editor : editor,
+              attributes : attributes,
+              hasTarget : hasTarget,
+              isEventHandled : isEventHandled,
+            })
           },
           [attributes.onDragStart]
         )}

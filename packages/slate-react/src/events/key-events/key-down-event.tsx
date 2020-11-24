@@ -1,6 +1,6 @@
 
 import { ReactEditor } from 'slate-react/src/plugin/react-editor'
-import Hotkeys from '../utils/hotkeys'
+import Hotkeys from 'slate-react/src/utils/hotkeys'
 import {
     Editor,
     SlateRange,
