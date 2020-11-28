@@ -419,7 +419,7 @@ export const ReactEditor = {
       // can determine what the offset relative to the text node is.
       if (leafNode) {
         textNode = leafNode.closest('[data-slate-node="text"]')!
-        const range = window.document.createRange()
+        const range = ReactEditor.window.document.createRange()
         range.setStart(textNode, 0)
         range.setEnd(nearestNode, nearestOffset)
         const contents = range.cloneContents()
@@ -571,4 +571,5 @@ export const ReactEditor = {
   },
   normalizeDOMPoint,
   ...Editor,
+  window
 }

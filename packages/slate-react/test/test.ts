@@ -1,10 +1,8 @@
 import { fixtures } from '../../../support/fixtures'
 import { ReactEditor } from '../src/plugin/react-editor'
-import { DOMSelection, DOMElement, DOMPoint } from '../src/utils/dom'
+import { DOMSelection, DOMPoint } from '../src/utils/dom'
 import { SlateRange, SlateNode } from 'slate'
 import { mock } from 'jest-mock-extended'
-import * as domDependency from '../src/utils/dom'
-import { exception } from 'console'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
@@ -23,7 +21,7 @@ describe('slate-react', () => {
   })
   fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { mockNearestDOMPoint, domPoint, output, exception, test } = module
+    const { mockNearestDOMPoint, domPoint, output, exception, calledTimes, mockParentNode, test } = module
 
     // Different test case for exceptions
     if (exception) {
@@ -40,6 +38,7 @@ describe('slate-react', () => {
 
       // Assert
       expect(result).toEqual(output)
+      expect(mockParentNode.removeChild).toBeCalledTimes(calledTimes)
     }
   })
 })
@@ -81,6 +80,8 @@ export const testToSlatePoint = (
   ReactEditor.toSlateNode = originalToSlateNode
   ReactEditor.findPath = originalFindPath
   ReactEditor.normalizeDOMPoint = originalNormalizeDOMPoint
+
+  return returnVal
 }
 
 export const testToSlateRange = (
