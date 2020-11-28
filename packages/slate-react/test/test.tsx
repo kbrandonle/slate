@@ -7,6 +7,7 @@ import { mock } from 'jest-mock-extended'
 import ReactDOM from "react-dom";
 import EditorExample, { getSelectionEditor } from 'slate-react/test/editor/sample-editor'
 import { act } from 'react-dom/test-utils';
+import { ELEMENT_TO_NODE } from 'slate-react/src/utils/weak-maps'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
@@ -57,13 +58,12 @@ const testToSlateRange = (
 
 describe('slate-react', () => {
   fixtures(__dirname, 'click-event', ({ module }) => {
-
     const {selector, output, input} = module
 
     var tree = document.createElement('div')
     document.body.appendChild(tree)
 
-    act(() => { // TODO: Refactor the whole click-event branch to export input, instead of having already filled input in sample editor
+    act(() => {
       ReactDOM.render(<EditorExample initValue={input}/>, tree)
     })
 
@@ -79,5 +79,31 @@ describe('slate-react', () => {
     })
 
     expect(getSelectionEditor().selection).toEqual(output) // selection should equal output selection
+  })
+})
+
+describe('slate-react', () => {
+  fixtures(__dirname, 'key-event', ({ module }) => {
+    const {selector, output, input} = module
+
+    var tree = document.createElement('div')
+    document.body.appendChild(tree)
+
+    act(() => {
+      ReactDOM.render(<EditorExample initValue={input}/>, tree)
+    })
+
+    //console.log(getSelectionEditor().children[0])
+
+    const element = tree.querySelector("p");
+
+    act(() => {
+      // simulate type event
+      element.dispatchEvent(new KeyboardEvent('keypress', {ctrlKey : false ,bubbles: true, key : 'c'}));
+      //element.innerHTML += "dfgdfgdfgdf"
+      //console.log("ELEMENT TEXT: " + element.textContent)
+    })
+
+    //console.log(getSelectionEditor().children[0].children)
   })
 })
