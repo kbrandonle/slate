@@ -44,12 +44,18 @@ import {
 } from '../utils/weak-maps'
 
 import { handleClickEvent } from 'slate-react/src/events/mouse-events/click-event'
-import { handleCopyEvent } from '../events/copy-event'
-import { handleCutEvent } from '../events/cut-event'
-import { handlePasteEvent } from '../events/paste-event'
+import { handleCopyEvent } from 'slate-react/src/events/editor-events/copy-event'
+import { handleCutEvent } from 'slate-react/src/events/editor-events/cut-event'
+import { handlePasteEvent } from 'slate-react/src/events/editor-events/paste-event'
 import { handleKeyDownEvent } from 'slate-react/src/events/key-events/key-down-event'
-import { handleOnBlurEvent } from '../events/blur-event'
+import { handleOnBlurEvent } from 'slate-react/src/events/editor-events/blur-event'
 import { handleDragStartEvent } from '../events/mouse-events/drag-start-event'
+import { handleDropEvent } from 'slate-react/src/events/mouse-events/on-drop-event'
+import { handleOnFocusEvent } from 'slate-react/src/events/editor-events/focus-event'
+import { handleDragOverEvent } from 'slate-react/src/events/mouse-events/drag-over-event'
+import { handleCompositionStartEvent } from 'slate-react/src/events/editor-events/composition-start-event'
+import { handleCompositionEndEvent } from 'slate-react/src/events/editor-events/composition-end-event'
+import { handleBeforeInputEvent } from 'slate-react/src/events/editor-events/before-input-event'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -510,19 +516,15 @@ export const Editable = (props: EditableProps) => {
         }}
         onBeforeInput={useCallback(
           (event: React.FormEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's leaky polyfill instead just for it. It
-            // only works for the `insertText` input type.
-            if (
-              !HAS_BEFORE_INPUT_SUPPORT &&
-              !readOnly &&
-              !isEventHandled(event, attributes.onBeforeInput) &&
-              hasEditableTarget(editor, event.target)
-            ) {
-              event.preventDefault()
-              const text = (event as any).data as string
-              Editor.insertText(editor, text)
-            }
+            handleBeforeInputEvent({
+              event : event,
+              editor : editor,
+              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT,
+              readOnly : readOnly,
+              isEventHandled : isEventHandled,
+              hasEditableTarget : hasEditableTarget,
+              attributes : attributes,
+            })
           },
           [readOnly]
         )}
@@ -562,31 +564,28 @@ export const Editable = (props: EditableProps) => {
         )}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionEnd)
-            ) {
-              state.isComposing = false
-
-              // COMPAT: In Chrome, `beforeinput` events for compositions
-              // aren't correct and never fire the "insertFromComposition"
-              // type that we need. So instead, insert whenever a composition
-              // ends since it will already have been committed to the DOM.
-              if (!IS_SAFARI && !IS_FIREFOX && event.data) {
-                Editor.insertText(editor, event.data)
-              }
-            }
+            handleCompositionEndEvent({
+              editor : editor,
+              event : event, 
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              attributes : attributes,
+              IS_SAFARI : IS_SAFARI,
+              IS_FIREFOX : IS_FIREFOX
+            })
           },
           [attributes.onCompositionEnd]
         )}
         onCompositionStart={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionStart)
-            ) {
-              state.isComposing = true
-            }
+            handleCompositionStartEvent({
+              event : event,
+              editor : editor,
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              attributes : attributes,
+              state : state
+            })
           },
           [attributes.onCompositionStart]
         )}
@@ -617,19 +616,13 @@ export const Editable = (props: EditableProps) => {
         )}
         onDragOver={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onDragOver)
-            ) {
-              // Only when the target is void, call `preventDefault` to signal
-              // that drops are allowed. Editable content is droppable by
-              // default, and calling `preventDefault` hides the cursor.
-              const node = ReactEditor.toSlateNode(editor, event.target)
-
-              if (Editor.isVoid(editor, node)) {
-                event.preventDefault()
-              }
-            }
+            handleDragOverEvent({
+              event : event,
+              editor : editor,
+              hasTarget : hasTarget,
+              isEventHandled : isEventHandled,
+              attributes : attributes,
+            })
           },
           [attributes.onDragOver]
         )}
@@ -647,50 +640,32 @@ export const Editable = (props: EditableProps) => {
         )}
         onDrop={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !readOnly &&
-              !isEventHandled(event, attributes.onDrop)
-            ) {
-              // COMPAT: Certain browsers don't fire `beforeinput` events at all, and
-              // Chromium browsers don't properly fire them for files being
-              // dropped into a `contenteditable`. (2019/11/26)
-              // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
-              if (
-                !HAS_BEFORE_INPUT_SUPPORT ||
-                (!IS_SAFARI && event.dataTransfer.files.length > 0)
-              ) {
-                event.preventDefault()
-                const range = ReactEditor.findEventRange(editor, event)
-                const data = event.dataTransfer
-                Transforms.select(editor, range)
-                ReactEditor.insertData(editor, data)
-              }
-            }
+            handleDropEvent({
+              editor : editor, 
+              event : event,
+              hasTarget : hasTarget,
+              isEventHandled : isEventHandled,
+              readOnly : readOnly,
+              attributes : attributes,
+              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT,
+              IS_SAFARI : IS_SAFARI
+            })
           },
           [readOnly, attributes.onDrop]
         )}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              !state.isUpdatingSelection &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onFocus)
-            ) {
-              const el = ReactEditor.toDOMNode(editor, editor)
-              state.latestElement = window.document.activeElement
-
-              // COMPAT: If the editor has nested editable elements, the focus
-              // can go to them. In Firefox, this must be prevented because it
-              // results in issues with keyboard navigation. (2017/03/30)
-              if (IS_FIREFOX && event.target !== el) {
-                el.focus()
-                return
-              }
-
-              IS_FOCUSED.set(editor, true)
-            }
+            handleOnFocusEvent({
+              event : event,
+              editor : editor,
+              readOnly : readOnly,
+              state : state,
+              hasEditableTarget : hasEditableTarget,
+              isEventHandled : isEventHandled,
+              attributes : attributes,
+              IS_FIREFOX : IS_FIREFOX,
+              IS_FOCUSED : IS_FOCUSED
+            })
           },
           [readOnly, attributes.onFocus]
         )}
