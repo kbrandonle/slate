@@ -95,6 +95,18 @@ describe('slate-react', () => {
   })
 })
 
+describe('slate-react', () => {
+  fixtures(__dirname, 'mac-key-event', ({ module }) => {
+    const {event, output } = module; 
+    
+    functionArray.map((hotkeyFunction, index) => {
+      act(() => {
+        expect(hotkeyFunction(event)).toEqual(output[index])
+      })
+    })
+  })
+})
+
 const functionArray = [e => Hotkeys.isBold(e), e => Hotkeys.isItalic(e), e => Hotkeys.isCompose(e), e => Hotkeys.isMoveBackward(e), 
     e => Hotkeys.isMoveForward(e), e => Hotkeys.isDeleteBackward(e), e => Hotkeys.isDeleteForward(e), e => Hotkeys.isDeleteLineBackward(e), 
     e => Hotkeys.isDeleteLineForward(e), e => Hotkeys.isDeleteWordBackward(e), e => Hotkeys.isExtendBackward(e),
