@@ -1,4 +1,4 @@
-import Hotkeys from '../../src/utils/hotkeys'
+
 
 export const event = new KeyboardEvent('keypress', {ctrlKey : true ,bubbles: true, key : 'b'})
 
