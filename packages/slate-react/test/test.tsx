@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 import EditorExample, { getSelectionEditor } from 'slate-react/test/editor/sample-editor'
 import { act } from 'react-dom/test-utils';
 import { ELEMENT_TO_NODE } from 'slate-react/src/utils/weak-maps'
+import Hotkeys from '../src/utils/hotkeys'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
@@ -84,7 +85,7 @@ describe('slate-react', () => {
 
 describe('slate-react', () => {
   fixtures(__dirname, 'key-event', ({ module }) => {
-    const {event , functionArray, output } = module; 
+    const {event, output } = module; 
     
     functionArray.map((hotkeyFunction, index) => {
       act(() => {
@@ -93,3 +94,10 @@ describe('slate-react', () => {
     })
   })
 })
+
+const functionArray = [e => Hotkeys.isBold(e), e => Hotkeys.isItalic(e), e => Hotkeys.isCompose(e), e => Hotkeys.isMoveBackward(e), 
+    e => Hotkeys.isMoveForward(e), e => Hotkeys.isDeleteBackward(e), e => Hotkeys.isDeleteForward(e), e => Hotkeys.isDeleteLineBackward(e), 
+    e => Hotkeys.isDeleteLineForward(e), e => Hotkeys.isDeleteWordBackward(e), e => Hotkeys.isExtendBackward(e),
+    e => Hotkeys.isDeleteWordForward(e),e => Hotkeys.isExtendForward(e), e => Hotkeys.isExtendLineBackward(e), e => Hotkeys.isExtendLineForward(e), 
+    e => Hotkeys.isMoveLineBackward(e), e => Hotkeys.isMoveLineForward(e), e => Hotkeys.isMoveWordBackward(e), e => Hotkeys.isMoveWordForward(e), 
+    e => Hotkeys.isRedo(e), e => Hotkeys.isSplitBlock(e), e => Hotkeys.isTransposeCharacter(e), e => Hotkeys.isUndo(e)]
