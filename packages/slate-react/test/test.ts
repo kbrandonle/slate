@@ -21,7 +21,7 @@ describe('slate-react', () => {
   })
   fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { mockNearestDOMPoint, domPoint, output, exception, calledTimes, mockParentNode, test } = module
+    const { mockNearestDOMPoint, domPoint, output, exception, mockPath, calledTimes, mockRemoveChild, mockGetWindow, test } = module
 
     // Different test case for exceptions
     if (exception) {
@@ -29,23 +29,25 @@ describe('slate-react', () => {
       expect(
         // Act in an arrow method so the expect can catch the exception
         () => {
-          test(mockNearestDOMPoint, domPoint)
+          test(mockNearestDOMPoint, domPoint, mockGetWindow, mockPath)
         }
       ).toThrow(exception)
     } else {
       // Act
-      const result = test(mockNearestDOMPoint, domPoint)
+      const result = test(mockNearestDOMPoint, domPoint, mockGetWindow, mockPath)
 
       // Assert
       expect(result).toEqual(output)
-      expect(mockParentNode.removeChild).toBeCalledTimes(calledTimes)
+      expect(mockRemoveChild).toBeCalledTimes(calledTimes)
     }
   })
 })
 
 export const testToSlatePoint = (
   mockNearestDOMPoint: [Node, Number],
-  domPoint: DOMPoint
+  domPoint: DOMPoint,
+  mockGetWindow: any, // ghetto mock of the window object
+  mockPath: Number[]
 ) => {
   // Create mock editor
   const mockEditor = mock<ReactEditor>()
@@ -55,8 +57,8 @@ export const testToSlatePoint = (
     .fn()
     .mockImplementation(() => mock<SlateNode>())
 
-  // basically we want this to mock the textNode that we found ising the rest of the code
-  const mockFindPath = jest.fn().mockReturnValue("test")
+  // basically we want this to mock the textNode that we found using the rest of the code
+  const mockFindPath = jest.fn().mockReturnValue(mockPath)
 
   // mock normalizeDOMPoint to return the value we recieve
   const mockNormalizeDOMPoint = jest
@@ -67,11 +69,13 @@ export const testToSlatePoint = (
   const originalToSlateNode = ReactEditor.toSlateNode
   const originalFindPath = ReactEditor.findPath
   const originalNormalizeDOMPoint = ReactEditor.normalizeDOMPoint
+  const originalGetWindow = ReactEditor.getWindow
 
   // replace implementations with mocked functions
   ReactEditor.toSlateNode = mockToSlateNode
   ReactEditor.findPath = mockFindPath
   ReactEditor.normalizeDOMPoint = mockNormalizeDOMPoint
+  ReactEditor.getWindow = mockGetWindow
 
   // Evaluate test function
   const returnVal = ReactEditor.toSlatePoint(mockEditor, domPoint)
@@ -80,6 +84,7 @@ export const testToSlatePoint = (
   ReactEditor.toSlateNode = originalToSlateNode
   ReactEditor.findPath = originalFindPath
   ReactEditor.normalizeDOMPoint = originalNormalizeDOMPoint
+  ReactEditor.getWindow = originalGetWindow
 
   return returnVal
 }

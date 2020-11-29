@@ -1,20 +1,32 @@
 /** @jsx jsx */
-import { fixtures } from '../../../../support/fixtures'
-import { ReactEditor } from '../../src/plugin/react-editor'
-import { DOMPoint, DOMElement } from '../../src/utils/dom'
-import { SlateRange, SlateNode } from 'slate'
+import { DOMPoint } from '../../src/utils/dom'
 import { mock } from 'jest-mock-extended'
-import * as domDependency from '../../src/utils/dom'
 import { testToSlatePoint } from '../test'
+
+const textContent = "testString" // length of 10
 
 // Create our mocks
 const mockNearestNode = mock<Node>()
-// const mockParentNode = mock<DOMElement>()
 
 const voidNode = mock<Element | null>()
-const leafNode = mock<Element | null>()
 const textNode = mock<Element | null>()
-const mockRange = mock<Range>() // mock range return for `window.document.createRange()`
+
+// When we return a leaf node, it will contain a function for looking up a deeper nested leafNode
+const mockLeafNode = {
+  closest: jest.fn((input: string) => {
+    return mockLeafNode
+  }),
+  textContent: textContent // each leaf node has mock text content
+}
+
+// mock function to count the number of times remove child is called.
+export const mockRemoveChild = jest.fn()
+
+const queryElement = {
+  parentNode: {
+    removeChild: mockRemoveChild
+  }
+}
 
 // Simply return the nodes we want it to return
 const mockClosestFn = jest.fn((input: string) => {
@@ -22,7 +34,7 @@ const mockClosestFn = jest.fn((input: string) => {
     case '[data-slate-void="true"]':
       return voidNode
     case '[data-slate-leaf]':
-      return leafNode
+      return mockLeafNode
     case '[data-slate-node="text"]':
       return textNode
   }
@@ -32,95 +44,71 @@ const mockClosestFn = jest.fn((input: string) => {
 const mockquerySelectorAllFn = jest.fn((input: string) => {
   switch (input) {
     case '[data-slate-zero-width]':
-      return leafNode
+      return [queryElement]
     case '[contenteditable=false]':
-      return leafNode
+      return [queryElement]
     case '[data-slate-leaf]':
-      return leafNode
+      return [queryElement]
   }
 })
 
-// Mock the hasAttribute funciton with a simple return
+// Mock the hasAttribute function with a simple return
 const mockHasAttribute = jest.fn().mockReturnValue(true)
 
 // create a mock of the document fragmnt contents
 const mockDocumentFragment = {
-  querySelectorAll: mockquerySelectorAllFn
+  querySelectorAll: mockquerySelectorAllFn,
+  textContent: textContent
 }
 
-const mockCloneContents = jest.fn().mockReturnValue(mockDocumentFragment)
+// mock range return for `window.document.createRange()`
+const mockRange = {
+  cloneContents: jest
+    .fn()
+    .mockReturnValue(mockDocumentFragment),
+  setStart: () => { }, // noop
+  setEnd: () => { } // noop
+}
 
+// we need to mock the window to use the createRange, so we will export our own window object
 const mockCreateRange = jest.fn().mockReturnValue(mockRange)
+const mockWindow = {
+  document: {
+    createRange: mockCreateRange
+  }
+}
+export function mockGetWindow() { return mockWindow }
 
 // Create a mock of the parent node that has interactive functions on it
-export const mockParentNode = {
+const mockParentNode = {
   closest: mockClosestFn,
-  removeChild: jest.fn(),
+  removeChild: mockRemoveChild,
   hasAttribute: mockHasAttribute
 }
 
 // mocking workaround for nearest node non-static property
 Object.defineProperty(mockNearestNode, 'parentNode', { get() { return mockParentNode } })
 
+// starting DOMPoint that we are testing from
 export const domPoint = mock<DOMPoint>()
-// [
-//   mock<Node>(), // Placeholder for node
-//   0 // placeholder for offset
-// ]
 
 export const mockNearestDOMPoint = [
   mockNearestNode, // Mock object that we attached all our functions to
-  0
-]
-
-export const output = [
-  mock<Node>(), // Placeholder for node
   0 // placeholder for offset
 ]
+
+// Mock path of our mock node
+export const mockPath = [0, 0]
+
+// The output we are expecting at the end of execution
+export const output = {
+  offset: textContent.length - 1, //subtract 1 since we start at 0
+  path: [0, 0] // mock path
+}
 
 // The number of times to expect that the query selector has removed
 export const calledTimes = 2
 
 // export the test scoped to this file, so our mocks don't affect the other tests
-export const test = (
-  mockNearestDOMPoint: [Node, Number],
-  domPoint: DOMPoint
-) => {
-  // Create mock editor
-  const mockEditor = mock<ReactEditor>()
-
-  // Mock toslateNode to at least return something
-  const mockToSlateNode = jest
-    .fn()
-    .mockImplementation(() => mock<SlateNode>())
-
-  // basically we want this to mock the textNode that we found ising the rest of the code
-  const mockFindPath = jest.fn().mockReturnValue("test")
-
-  // mock normalizeDOMPoint to return the value we recieve
-  const mockNormalizeDOMPoint = jest
-    .fn()
-    .mockReturnValue(mockNearestDOMPoint)
-
-  // Save a refereance to the original functions
-  const originalToSlateNode = ReactEditor.toSlateNode
-  const originalFindPath = ReactEditor.findPath
-  const originalNormalizeDOMPoint = ReactEditor.normalizeDOMPoint
-
-  // replace implementations with mocked functions
-  ReactEditor.toSlateNode = mockToSlateNode
-  ReactEditor.findPath = mockFindPath
-  ReactEditor.normalizeDOMPoint = mockNormalizeDOMPoint
-  ReactEditor.window =
-
-  // Evaluate test function
-  const returnVal = ReactEditor.toSlatePoint(mockEditor, domPoint)
-
-  // replace implementations with original functions
-  ReactEditor.toSlateNode = originalToSlateNode
-  ReactEditor.findPath = originalFindPath
-  ReactEditor.normalizeDOMPoint = originalNormalizeDOMPoint
-
-  return returnVal
-}
+export const test = testToSlatePoint
 

@@ -400,6 +400,11 @@ export const ReactEditor = {
     return range
   },
 
+  // Helper function to assist with mocking things that make use of the window object
+  getWindow(): Window {
+    return window
+  },
+
   /**
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
@@ -419,7 +424,7 @@ export const ReactEditor = {
       // can determine what the offset relative to the text node is.
       if (leafNode) {
         textNode = leafNode.closest('[data-slate-node="text"]')!
-        const range = ReactEditor.window.document.createRange()
+        const range = ReactEditor.getWindow().document.createRange()
         range.setStart(textNode, 0)
         range.setEnd(nearestNode, nearestOffset)
         const contents = range.cloneContents()
@@ -570,6 +575,5 @@ export const ReactEditor = {
     return { anchor, focus }
   },
   normalizeDOMPoint,
-  ...Editor,
-  window
+  ...Editor
 }
