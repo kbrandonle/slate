@@ -47,6 +47,38 @@ describe('slate-react', () => {
       expect(mockRemoveChild).toBeCalledTimes(calledTimes)
     }
   })
+  fixtures(__dirname, 'click-event', ({ module }) => {
+    const { selector, output, input } = module
+
+    var tree = document.createElement('div')
+    document.body.appendChild(tree)
+
+    act(() => {
+      ReactDOM.render(<EditorExample initValue={input} />, tree)
+    })
+
+    // selection should be null at init
+    expect(getSelectionEditor().selection).toEqual(null)
+
+    // get the element by matching its element tag
+    const element = tree.querySelector(selector)
+
+    act(() => {
+      // simulate a click
+      element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    })
+
+    expect(getSelectionEditor().selection).toEqual(output) // selection should equal output selection
+  })
+  fixtures(__dirname, 'key-event', ({ module }) => {
+    const { event, output } = module;
+
+    functionArray.map((hotkeyFunction, index) => {
+      act(() => {
+        expect(hotkeyFunction(event)).toEqual(output[index])
+      })
+    })
+  })
 })
 
 export const testToSlateRange = (
@@ -137,44 +169,6 @@ export const testToSlatePoint = (
 
   return returnVal
 }
-
-describe('slate-react', () => {
-  fixtures(__dirname, 'click-event', ({ module }) => {
-    const { selector, output, input } = module
-
-    var tree = document.createElement('div')
-    document.body.appendChild(tree)
-
-    act(() => {
-      ReactDOM.render(<EditorExample initValue={input} />, tree)
-    })
-
-    // selection should be null at init
-    expect(getSelectionEditor().selection).toEqual(null)
-
-    // get the element by matching its element tag
-    const element = tree.querySelector(selector)
-
-    act(() => {
-      // simulate a click
-      element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    })
-
-    expect(getSelectionEditor().selection).toEqual(output) // selection should equal output selection
-  })
-})
-
-describe('slate-react', () => {
-  fixtures(__dirname, 'key-event', ({ module }) => {
-    const { event, output } = module;
-
-    functionArray.map((hotkeyFunction, index) => {
-      act(() => {
-        expect(hotkeyFunction(event)).toEqual(output[index])
-      })
-    })
-  })
-})
 
 const functionArray = [e => Hotkeys.isBold(e), e => Hotkeys.isItalic(e), e => Hotkeys.isCompose(e), e => Hotkeys.isMoveBackward(e),
 e => Hotkeys.isMoveForward(e), e => Hotkeys.isDeleteBackward(e), e => Hotkeys.isDeleteForward(e), e => Hotkeys.isDeleteLineBackward(e),
