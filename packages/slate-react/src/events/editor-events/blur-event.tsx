@@ -5,8 +5,8 @@ import {
 
 export function handleOnBlurEvent(props : any) {
 
-    const editor : ReactEditor = props.editor
-    const event: React.FocusEvent<HTMLDivElement> = props.event
+    const editor: ReactEditor = props.editor
+    const event = props.event
     const state = props.state
 
     if (
