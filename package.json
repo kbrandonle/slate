@@ -87,7 +87,7 @@
     "slate": "*",
     "slate-history": "*",
     "slate-hyperscript": "*",
-    "slate-react": "^0.59.0",
+    "slate-react": "*",
     "source-map-loader": "^0.2.4",
     "ts-jest": "^26.4.2",
     "typescript": "^3.7.2"
