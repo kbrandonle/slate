@@ -11,10 +11,11 @@ const mockNearestNode = mock<Node>()
 const voidNode = mock<Element | null>()
 const textNode = mock<Element | null>()
 
-// When we return a void node, it will contain a function for looking up a deeper nested voidNode
-const mockVoidNode = {
-  closest: jest.fn(() => { return mockVoidNode }),
-  querySelector: jest.fn(() => { return mockVoidNode }),
+// When we return a leaf node, it will contain a function for looking up a deeper nested leafNode
+const mockLeafNode = {
+  closest: jest.fn((input: string) => {
+    return mockLeafNode
+  }),
   textContent: textContent // each leaf node has mock text content
 }
 
@@ -31,28 +32,26 @@ const queryElement = {
 const mockClosestFn = jest.fn((input: string) => {
   switch (input) {
     case '[data-slate-void="true"]':
-      return mockVoidNode
+      return voidNode
     case '[data-slate-leaf]':
-      return null
+      return mockLeafNode
     case '[data-slate-node="text"]':
       return textNode
   }
 })
 
-// Simply return the nodes we want
-const mockquerySelectorAllFn = jest.fn((input: string) => {
-  switch (input) {
-    case '[data-slate-zero-width]':
-      return [queryElement]
-    case '[contenteditable=false]':
-      return [queryElement]
-    case '[data-slate-leaf]':
-      return [queryElement]
-  }
-})
+// Simply return empty array since we are simulating an empty list
+const mockquerySelectorAllFn = jest.fn().mockReturnValue([])
 
 // Mock the hasAttribute function with a simple return
 const mockHasAttribute = jest.fn().mockReturnValue(true)
+
+// Create a mock of the parent node that has interactive functions on it
+const mockParentNode = {
+  closest: mockClosestFn,
+  removeChild: mockRemoveChild,
+  hasAttribute: mockHasAttribute
+}
 
 // create a mock of the document fragmnt contents
 const mockDocumentFragment = {
@@ -78,13 +77,6 @@ const mockWindow = {
 }
 export function mockGetWindow() { return mockWindow }
 
-// Create a mock of the parent node that has interactive functions on it
-const mockParentNode = {
-  closest: mockClosestFn,
-  removeChild: mockRemoveChild,
-  hasAttribute: mockHasAttribute
-}
-
 // mocking workaround for nearest node non-static property
 Object.defineProperty(mockNearestNode, 'parentNode', { get() { return mockParentNode } })
 
@@ -101,7 +93,7 @@ export const mockPath = [0, 0]
 
 // The output we are expecting at the end of execution
 export const output = {
-  offset: textContent.length - 1, //subtract 1 since we start at 0
+  offset: textContent.length - 1, //subtract 1 since we are the same length as the domnode
   path: [0, 0] // mock path
 }
 
