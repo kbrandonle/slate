@@ -101,3 +101,5 @@ const functionArray = [e => Hotkeys.isBold(e), e => Hotkeys.isItalic(e), e => Ho
     e => Hotkeys.isDeleteWordForward(e),e => Hotkeys.isExtendForward(e), e => Hotkeys.isExtendLineBackward(e), e => Hotkeys.isExtendLineForward(e), 
     e => Hotkeys.isMoveLineBackward(e), e => Hotkeys.isMoveLineForward(e), e => Hotkeys.isMoveWordBackward(e), e => Hotkeys.isMoveWordForward(e), 
     e => Hotkeys.isRedo(e), e => Hotkeys.isSplitBlock(e), e => Hotkeys.isTransposeCharacter(e), e => Hotkeys.isUndo(e)]
+
+// https://keycode.info/   -- info for each string key
