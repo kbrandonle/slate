@@ -575,5 +575,5 @@ export const ReactEditor = {
     return { anchor, focus }
   },
   normalizeDOMPoint,
-  ...Editor
+  ...Editor,
 }

@@ -3,7 +3,7 @@ import { DOMPoint } from '../../src/utils/dom'
 import { mock } from 'jest-mock-extended'
 import { testToSlatePoint } from '../test'
 
-const textContent = "testString" // length of 10
+const textContent = 'testString' // length of 10
 
 // Create our mocks
 const mockNearestNode = mock<Node>()
@@ -16,7 +16,7 @@ const mockLeafNode = {
   closest: jest.fn((input: string) => {
     return mockLeafNode
   }),
-  textContent: textContent // each leaf node has mock text content
+  textContent, // each leaf node has mock text content
 }
 
 // mock function to count the number of times remove child is called.
@@ -24,8 +24,8 @@ export const mockRemoveChild = jest.fn()
 
 const queryElement = {
   parentNode: {
-    removeChild: mockRemoveChild
-  }
+    removeChild: mockRemoveChild,
+  },
 }
 
 // Simply return the nodes we want it to return
@@ -50,42 +50,46 @@ const mockHasAttribute = jest.fn().mockReturnValue(false)
 const mockParentNode = {
   closest: mockClosestFn,
   removeChild: mockRemoveChild,
-  hasAttribute: mockHasAttribute
+  hasAttribute: mockHasAttribute,
 }
 
 // create a mock of the document fragmnt contents
 const mockDocumentFragment = {
   querySelectorAll: mockquerySelectorAllFn,
-  textContent: textContent
+  textContent,
 }
 
 // mock range return for `window.document.createRange()`
 const mockRange = {
-  cloneContents: jest
-    .fn()
-    .mockReturnValue(mockDocumentFragment),
-  setStart: () => { }, // noop
-  setEnd: () => { } // noop
+  cloneContents: jest.fn().mockReturnValue(mockDocumentFragment),
+  setStart: () => {}, // noop
+  setEnd: () => {}, // noop
 }
 
 // we need to mock the window to use the createRange, so we will export our own window object
 const mockCreateRange = jest.fn().mockReturnValue(mockRange)
 const mockWindow = {
   document: {
-    createRange: mockCreateRange
-  }
+    createRange: mockCreateRange,
+  },
 }
-export function mockGetWindow() { return mockWindow }
+export function mockGetWindow() {
+  return mockWindow
+}
 
 // mocking workaround for nearest node non-static property
-Object.defineProperty(mockNearestNode, 'parentNode', { get() { return mockParentNode } })
+Object.defineProperty(mockNearestNode, 'parentNode', {
+  get() {
+    return mockParentNode
+  },
+})
 
 // starting DOMPoint that we are testing from
 export const domPoint = mock<DOMPoint>()
 
 export const mockNearestDOMPoint = [
   mockNearestNode, // Mock object that we attached all our functions to
-  0 // placeholder for offset
+  0, // placeholder for offset
 ]
 
 // Mock path of our mock node
@@ -93,8 +97,8 @@ export const mockPath = [0, 0]
 
 // The output we are expecting at the end of execution
 export const output = {
-  offset: textContent.length, //Do not subtract 1 since we are the same length as the domnode (there are no sero-width characters)
-  path: [0, 0] // mock path
+  offset: textContent.length, // Do not subtract 1 since we are the same length as the domnode (there are no sero-width characters)
+  path: [0, 0], // mock path
 }
 
 // The number of times to expect that the query selector has removed
@@ -102,4 +106,3 @@ export const calledTimes = 0
 
 // export the test scoped to this file, so our mocks don't affect the other tests
 export const test = testToSlatePoint
-

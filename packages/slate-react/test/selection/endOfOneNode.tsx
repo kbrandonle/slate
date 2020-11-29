@@ -4,7 +4,6 @@ import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 import { testToSlateRange } from '../test'
 
-
 const anchorNode = mock<DOMNode>()
 anchorNode.nodeValue = 'length' // length of 6
 
@@ -34,4 +33,3 @@ export const output = {
 }
 
 export const test = testToSlateRange
-

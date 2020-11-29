@@ -18,9 +18,7 @@ const mockRange = mock<Range>() // mock range return for `window.document.create
 
 const mockDocumentFragment = mock<DocumentFragment>()
 
-const mockCloneContents = jest
-  .fn()
-  .mockReturnValue(mockDocumentFragment)
+const mockCloneContents = jest.fn().mockReturnValue(mockDocumentFragment)
 
 // Simply return the nodes we want it to return
 const mockClosestFn = jest.fn((input: string) => {
@@ -47,7 +45,11 @@ const mockquerySelectorAllFn = jest.fn((input: string) => {
 })
 
 // mocking workaround for nearest node non-static property
-Object.defineProperty(mockNearestNode, 'parentNode', { get() { return null; } });
+Object.defineProperty(mockNearestNode, 'parentNode', {
+  get() {
+    return null
+  },
+})
 
 // jest
 //   .spyOn(mockNearestNode, 'parentNode')
@@ -61,16 +63,18 @@ export const domPoint = mock<DOMPoint>()
 
 export const mockNearestDOMPoint = [
   mockNearestNode, // Mock object that we attached all our functions to
-  0
+  0,
 ]
 
 export const output = [
   mock<Node>(), // Placeholder for node
-  0 // placeholder for offset
+  0, // placeholder for offset
 ]
 
 // We expect this code to throw an error
-export const exception = new Error(`Cannot resolve a Slate point from DOM point: ${domPoint}`);
+export const exception = new Error(
+  `Cannot resolve a Slate point from DOM point: ${domPoint}`
+)
 
 // export the test scoped to this file, so our mocks don't affect the other tests
 export const test = testToSlatePoint

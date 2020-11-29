@@ -1,4 +1,5 @@
-export const input = [{
+export const input = [
+  {
     type: 'table',
     children: [
       {
@@ -65,8 +66,9 @@ export const input = [{
         ],
       },
     ],
-  },]
+  },
+]
 
-export const selector = "tr"
+export const selector = 'tr'
 
 export const output = null

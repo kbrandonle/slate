@@ -1,33 +1,52 @@
 import React from 'react'
 import { fixtures } from '../../../support/fixtures'
 import { ReactEditor } from 'slate-react/src/plugin/react-editor'
-import { DOMSelection, DOMNode, DOMPoint, SlateRangeDescription } from 'slate-react/src/utils/dom'
+import {
+  DOMSelection,
+  DOMNode,
+  DOMPoint,
+  SlateRangeDescription,
+} from 'slate-react/src/utils/dom'
 import { SlateRange, SlateNode } from 'slate'
 import { mock } from 'jest-mock-extended'
-import ReactDOM from "react-dom";
-import EditorExample, { getSelectionEditor } from 'slate-react/test/editor/sample-editor'
-import { act } from 'react-dom/test-utils';
+import ReactDOM from 'react-dom'
+import EditorExample, {
+  getSelectionEditor,
+} from 'slate-react/test/editor/sample-editor'
+import { act } from 'react-dom/test-utils'
 import { ELEMENT_TO_NODE } from 'slate-react/src/utils/weak-maps'
 import Hotkeys from '../src/utils/hotkeys'
 
 describe('slate-react', () => {
   fixtures(__dirname, 'selection', ({ module }) => {
     // Arrange
-    const { selection, slateRangeSelection, nextNodeEntry, output, test } = module
-
-    // Act
-    const result = test(
+    const {
       selection,
       slateRangeSelection,
-      nextNodeEntry
-    )
+      nextNodeEntry,
+      output,
+      test,
+    } = module
+
+    // Act
+    const result = test(selection, slateRangeSelection, nextNodeEntry)
 
     // Assert
     expect(result).toEqual(output)
   })
   fixtures(__dirname, 'toSlatePoint', ({ module }) => {
     // Arrange
-    const { mockNearestDOMPoint, domPoint, output, exception, mockPath, calledTimes, mockRemoveChild, mockGetWindow, test } = module
+    const {
+      mockNearestDOMPoint,
+      domPoint,
+      output,
+      exception,
+      mockPath,
+      calledTimes,
+      mockRemoveChild,
+      mockGetWindow,
+      test,
+    } = module
 
     // Different test case for exceptions
     if (exception) {
@@ -40,7 +59,12 @@ describe('slate-react', () => {
       ).toThrow(exception)
     } else {
       // Act
-      const result = test(mockNearestDOMPoint, domPoint, mockGetWindow, mockPath)
+      const result = test(
+        mockNearestDOMPoint,
+        domPoint,
+        mockGetWindow,
+        mockPath
+      )
 
       // Assert
       expect(result).toEqual(output)
@@ -50,7 +74,7 @@ describe('slate-react', () => {
   fixtures(__dirname, 'click-event', ({ module }) => {
     const { selector, output, input } = module
 
-    var tree = document.createElement('div')
+    const tree = document.createElement('div')
     document.body.appendChild(tree)
 
     act(() => {
@@ -65,13 +89,13 @@ describe('slate-react', () => {
 
     act(() => {
       // simulate a click
-      element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      element.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     expect(getSelectionEditor().selection).toEqual(output) // selection should equal output selection
   })
   fixtures(__dirname, 'key-event', ({ module }) => {
-    const { event, output } = module;
+    const { event, output } = module
 
     functionArray.map((hotkeyFunction, index) => {
       act(() => {
@@ -105,7 +129,8 @@ export const testToSlateRange = (
 
   // Save a refereance to the original functions
   const originalToSlatePoint = ReactEditor.toSlatePoint
-  const originalDomRangeToSlateRangeDescription = ReactEditor.domRangeToSlateRangeDescription
+  const originalDomRangeToSlateRangeDescription =
+    ReactEditor.domRangeToSlateRangeDescription
   const originalNext = ReactEditor.next
 
   // replace dependancies with mocked implementations
@@ -134,17 +159,13 @@ export const testToSlatePoint = (
   const mockEditor = mock<ReactEditor>()
 
   // Mock toslateNode to at least return something
-  const mockToSlateNode = jest
-    .fn()
-    .mockImplementation(() => mock<SlateNode>())
+  const mockToSlateNode = jest.fn().mockImplementation(() => mock<SlateNode>())
 
   // basically we want this to mock the textNode that we found using the rest of the code
   const mockFindPath = jest.fn().mockReturnValue(mockPath)
 
   // mock normalizeDOMPoint to return the value we recieve
-  const mockNormalizeDOMPoint = jest
-    .fn()
-    .mockReturnValue(mockNearestDOMPoint)
+  const mockNormalizeDOMPoint = jest.fn().mockReturnValue(mockNearestDOMPoint)
 
   // Save a refereance to the original functions
   const originalToSlateNode = ReactEditor.toSlateNode
@@ -170,11 +191,30 @@ export const testToSlatePoint = (
   return returnVal
 }
 
-const functionArray = [e => Hotkeys.isBold(e), e => Hotkeys.isItalic(e), e => Hotkeys.isCompose(e), e => Hotkeys.isMoveBackward(e),
-e => Hotkeys.isMoveForward(e), e => Hotkeys.isDeleteBackward(e), e => Hotkeys.isDeleteForward(e), e => Hotkeys.isDeleteLineBackward(e),
-e => Hotkeys.isDeleteLineForward(e), e => Hotkeys.isDeleteWordBackward(e), e => Hotkeys.isExtendBackward(e),
-e => Hotkeys.isDeleteWordForward(e), e => Hotkeys.isExtendForward(e), e => Hotkeys.isExtendLineBackward(e), e => Hotkeys.isExtendLineForward(e),
-e => Hotkeys.isMoveLineBackward(e), e => Hotkeys.isMoveLineForward(e), e => Hotkeys.isMoveWordBackward(e), e => Hotkeys.isMoveWordForward(e),
-e => Hotkeys.isRedo(e), e => Hotkeys.isSplitBlock(e), e => Hotkeys.isTransposeCharacter(e), e => Hotkeys.isUndo(e)]
+const functionArray = [
+  e => Hotkeys.isBold(e),
+  e => Hotkeys.isItalic(e),
+  e => Hotkeys.isCompose(e),
+  e => Hotkeys.isMoveBackward(e),
+  e => Hotkeys.isMoveForward(e),
+  e => Hotkeys.isDeleteBackward(e),
+  e => Hotkeys.isDeleteForward(e),
+  e => Hotkeys.isDeleteLineBackward(e),
+  e => Hotkeys.isDeleteLineForward(e),
+  e => Hotkeys.isDeleteWordBackward(e),
+  e => Hotkeys.isExtendBackward(e),
+  e => Hotkeys.isDeleteWordForward(e),
+  e => Hotkeys.isExtendForward(e),
+  e => Hotkeys.isExtendLineBackward(e),
+  e => Hotkeys.isExtendLineForward(e),
+  e => Hotkeys.isMoveLineBackward(e),
+  e => Hotkeys.isMoveLineForward(e),
+  e => Hotkeys.isMoveWordBackward(e),
+  e => Hotkeys.isMoveWordForward(e),
+  e => Hotkeys.isRedo(e),
+  e => Hotkeys.isSplitBlock(e),
+  e => Hotkeys.isTransposeCharacter(e),
+  e => Hotkeys.isUndo(e),
+]
 
 // https://keycode.info/   -- info for each string key

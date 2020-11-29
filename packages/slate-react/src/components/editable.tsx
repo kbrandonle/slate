@@ -517,61 +517,62 @@ export const Editable = (props: EditableProps) => {
         onBeforeInput={useCallback(
           (event: React.FormEvent<HTMLDivElement>) => {
             handleBeforeInputEvent({
-              event : event,
-              editor : editor,
-              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT,
-              readOnly : readOnly,
-              isEventHandled : isEventHandled,
-              hasEditableTarget : hasEditableTarget,
-              attributes : attributes,
+              event,
+              editor,
+              HAS_BEFORE_INPUT_SUPPORT,
+              readOnly,
+              isEventHandled,
+              hasEditableTarget,
+              attributes,
             })
           },
           [readOnly]
         )}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
-             handleOnBlurEvent({
-              event : event,
-              editor : editor, 
-              state : state, 
-              readOnly : readOnly,
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              isDOMElement : isDOMElement,
-              isDOMNode : isDOMNode,
-              attributes : attributes,
-              IS_FOCUSED : IS_FOCUSED,
-             })
+            handleOnBlurEvent({
+              event,
+              editor,
+              state,
+              readOnly,
+              hasEditableTarget,
+              isEventHandled,
+              isDOMElement,
+              isDOMNode,
+              attributes,
+              IS_FOCUSED,
+            })
           },
           [readOnly, attributes.onBlur]
         )}
         onClick={useCallback(
           (event: React.MouseEvent<HTMLDivElement>) => {
             handleClickEvent({
-              readOnly: readOnly,
-              editor: editor,
-              ReactEditor: ReactEditor,
-              event: event,
-              isEventHandled: isEventHandled,
-              hasTarget: hasTarget,
-              isDOMNode: isDOMNode,
-              Editor: Editor,
-              Path: Path,
-              Transforms: Transforms,
-              attributes: attributes})
-            },
+              readOnly,
+              editor,
+              ReactEditor,
+              event,
+              isEventHandled,
+              hasTarget,
+              isDOMNode,
+              Editor,
+              Path,
+              Transforms,
+              attributes,
+            })
+          },
           [readOnly, attributes.onClick]
         )}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
             handleCompositionEndEvent({
-              editor : editor,
-              event : event, 
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              attributes : attributes,
-              IS_SAFARI : IS_SAFARI,
-              IS_FIREFOX : IS_FIREFOX
+              editor,
+              event,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              IS_SAFARI,
+              IS_FIREFOX,
             })
           },
           [attributes.onCompositionEnd]
@@ -579,12 +580,12 @@ export const Editable = (props: EditableProps) => {
         onCompositionStart={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
             handleCompositionStartEvent({
-              event : event,
-              editor : editor,
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              attributes : attributes,
-              state : state
+              event,
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              state,
             })
           },
           [attributes.onCompositionStart]
@@ -592,11 +593,11 @@ export const Editable = (props: EditableProps) => {
         onCopy={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
             handleCopyEvent({
-              editor : editor, 
-              hasEditableTarget : hasEditableTarget, 
-              isEventHandled : isEventHandled,
-              attributes : attributes, 
-              event : event
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              event,
             })
           },
           [attributes.onCopy]
@@ -604,12 +605,12 @@ export const Editable = (props: EditableProps) => {
         onCut={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
             handleCutEvent({
-              editor: editor,
-              event : event, 
-              readOnly : readOnly, 
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              attributes: attributes
+              editor,
+              event,
+              readOnly,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
             })
           },
           [readOnly, attributes.onCut]
@@ -617,11 +618,11 @@ export const Editable = (props: EditableProps) => {
         onDragOver={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
             handleDragOverEvent({
-              event : event,
-              editor : editor,
-              hasTarget : hasTarget,
-              isEventHandled : isEventHandled,
-              attributes : attributes,
+              event,
+              editor,
+              hasTarget,
+              isEventHandled,
+              attributes,
             })
           },
           [attributes.onDragOver]
@@ -629,11 +630,11 @@ export const Editable = (props: EditableProps) => {
         onDragStart={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
             handleDragStartEvent({
-              event : event,
-              editor : editor,
-              attributes : attributes,
-              hasTarget : hasTarget,
-              isEventHandled : isEventHandled,
+              event,
+              editor,
+              attributes,
+              hasTarget,
+              isEventHandled,
             })
           },
           [attributes.onDragStart]
@@ -641,14 +642,14 @@ export const Editable = (props: EditableProps) => {
         onDrop={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
             handleDropEvent({
-              editor : editor, 
-              event : event,
-              hasTarget : hasTarget,
-              isEventHandled : isEventHandled,
-              readOnly : readOnly,
-              attributes : attributes,
-              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT,
-              IS_SAFARI : IS_SAFARI
+              editor,
+              event,
+              hasTarget,
+              isEventHandled,
+              readOnly,
+              attributes,
+              HAS_BEFORE_INPUT_SUPPORT,
+              IS_SAFARI,
             })
           },
           [readOnly, attributes.onDrop]
@@ -656,15 +657,15 @@ export const Editable = (props: EditableProps) => {
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             handleOnFocusEvent({
-              event : event,
-              editor : editor,
-              readOnly : readOnly,
-              state : state,
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              attributes : attributes,
-              IS_FIREFOX : IS_FIREFOX,
-              IS_FOCUSED : IS_FOCUSED
+              event,
+              editor,
+              readOnly,
+              state,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              IS_FIREFOX,
+              IS_FOCUSED,
             })
           },
           [readOnly, attributes.onFocus]
@@ -672,27 +673,27 @@ export const Editable = (props: EditableProps) => {
         onKeyDown={useCallback(
           (event: React.KeyboardEvent<HTMLDivElement>) => {
             handleKeyDownEvent({
-              editor : editor, 
-              hasEditableTarget : hasEditableTarget,
-              isEventHandled : isEventHandled,
-              attributes : attributes,
-              event : event,
-              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              event,
+              HAS_BEFORE_INPUT_SUPPORT,
             })
           },
           [readOnly, attributes.onKeyDown]
         )}
-         onPaste={useCallback(
-           (event: React.ClipboardEvent<HTMLDivElement>) => {
+        onPaste={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
             handlePasteEvent({
-              editor : editor,
-              event : event, 
-              hasEditableTarget : hasEditableTarget, 
-              isEventHandled : isEventHandled,
-              isPlainTextOnlyPaste : isPlainTextOnlyPaste,
-              HAS_BEFORE_INPUT_SUPPORT : HAS_BEFORE_INPUT_SUPPORT, 
-              readOnly : readOnly,
-              attributes : attributes
+              editor,
+              event,
+              hasEditableTarget,
+              isEventHandled,
+              isPlainTextOnlyPaste,
+              HAS_BEFORE_INPUT_SUPPORT,
+              readOnly,
+              attributes,
             })
           },
           [readOnly, attributes.onPaste]
