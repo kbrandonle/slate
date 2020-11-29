@@ -84,26 +84,12 @@ describe('slate-react', () => {
 
 describe('slate-react', () => {
   fixtures(__dirname, 'key-event', ({ module }) => {
-    const {selector, output, input} = module
-
-    var tree = document.createElement('div')
-    document.body.appendChild(tree)
-
-    act(() => {
-      ReactDOM.render(<EditorExample initValue={input}/>, tree)
+    const {event , functionArray, output } = module; 
+    
+    functionArray.map((hotkeyFunction, index) => {
+      act(() => {
+        expect(hotkeyFunction(event)).toEqual(output[index])
+      })
     })
-
-    //console.log(getSelectionEditor().children[0])
-
-    const element = tree.querySelector("p");
-
-    act(() => {
-      // simulate type event
-      element.dispatchEvent(new KeyboardEvent('keypress', {ctrlKey : false ,bubbles: true, key : 'c'}));
-      //element.innerHTML += "dfgdfgdfgdf"
-      //console.log("ELEMENT TEXT: " + element.textContent)
-    })
-
-    //console.log(getSelectionEditor().children[0].children)
   })
 })
