@@ -1,4 +1,4 @@
-export const event = new KeyboardEvent('keypress', {shiftKey : true ,metaKey: true, key : 'z'})
+export const event = new KeyboardEvent('keypress', { metaKey: true, key : 'backspace'})
 
 export const output = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
     false, false, false]
