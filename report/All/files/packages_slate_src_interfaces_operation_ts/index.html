@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate/src/interfaces/operation.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate/src/interfaces/operation.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">26.87</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">283</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">61.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.35</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { Node, Path, Range } from &#039;..&#039;
+import isPlainObject from &#039;is-plain-object&#039;
+
+export type InsertNodeOperation = {
+  type: &#039;insert_node&#039;
+  path: Path
+  node: Node
+  [key: string]: unknown
+}
+
+export type InsertTextOperation = {
+  type: &#039;insert_text&#039;
+  path: Path
+  offset: number
+  text: string
+  [key: string]: unknown
+}
+
+export type MergeNodeOperation = {
+  type: &#039;merge_node&#039;
+  path: Path
+  position: number
+  properties: Partial&lt;Node&gt;
+  [key: string]: unknown
+}
+
+export type MoveNodeOperation = {
+  type: &#039;move_node&#039;
+  path: Path
+  newPath: Path
+  [key: string]: unknown
+}
+
+export type RemoveNodeOperation = {
+  type: &#039;remove_node&#039;
+  path: Path
+  node: Node
+  [key: string]: unknown
+}
+
+export type RemoveTextOperation = {
+  type: &#039;remove_text&#039;
+  path: Path
+  offset: number
+  text: string
+  [key: string]: unknown
+}
+
+export type SetNodeOperation = {
+  type: &#039;set_node&#039;
+  path: Path
+  properties: Partial&lt;Node&gt;
+  newProperties: Partial&lt;Node&gt;
+  [key: string]: unknown
+}
+
+export type SetSelectionOperation =
+  | {
+      type: &#039;set_selection&#039;
+      [key: string]: unknown
+      properties: null
+      newProperties: Range
+    }
+  | {
+      type: &#039;set_selection&#039;
+      [key: string]: unknown
+      properties: Partial&lt;Range&gt;
+      newProperties: Partial&lt;Range&gt;
+    }
+  | {
+      type: &#039;set_selection&#039;
+      [key: string]: unknown
+      properties: Range
+      newProperties: null
+    }
+
+export type SplitNodeOperation = {
+  type: &#039;split_node&#039;
+  path: Path
+  position: number
+  properties: Partial&lt;Node&gt;
+  [key: string]: unknown
+}
+
+export type NodeOperation =
+  | InsertNodeOperation
+  | MergeNodeOperation
+  | MoveNodeOperation
+  | RemoveNodeOperation
+  | SetNodeOperation
+  | SplitNodeOperation
+
+export type SelectionOperation = SetSelectionOperation
+
+export type TextOperation = InsertTextOperation | RemoveTextOperation
+
+/**
+ * `Operation` objects define the low-level instructions that Slate editors use
+ * to apply changes to their internal state. Representing all changes as
+ * operations is what allows Slate editors to easily implement history,
+ * collaboration, and other features.
+ */
+
+export type Operation = NodeOperation | SelectionOperation | TextOperation
+
+export const Operation = {
+  /**
+   * Check of a value is a `NodeOperation` object.
+   */
+
+  isNodeOperation(value: any): value is NodeOperation {
+    return Operation.isOperation(value) &amp;&amp; value.type.endsWith(&#039;_node&#039;)
+  },
+
+  /**
+   * Check of a value is an `Operation` object.
+   */
+
+  isOperation(value: any): value is Operation {
+    if (!isPlainObject(value)) {
+      return false
+    }
+
+    switch (value.type) {
+      case &#039;insert_node&#039;:
+        return Path.isPath(value.path) &amp;&amp; Node.isNode(value.node)
+      case &#039;insert_text&#039;:
+        return (
+          typeof value.offset === &#039;number&#039; &amp;&amp;
+          typeof value.text === &#039;string&#039; &amp;&amp;
+          Path.isPath(value.path)
+        )
+      case &#039;merge_node&#039;:
+        return (
+          typeof value.position === &#039;number&#039; &amp;&amp;
+          Path.isPath(value.path) &amp;&amp;
+          isPlainObject(value.properties)
+        )
+      case &#039;move_node&#039;:
+        return Path.isPath(value.path) &amp;&amp; Path.isPath(value.newPath)
+      case &#039;remove_node&#039;:
+        return Path.isPath(value.path) &amp;&amp; Node.isNode(value.node)
+      case &#039;remove_text&#039;:
+        return (
+          typeof value.offset === &#039;number&#039; &amp;&amp;
+          typeof value.text === &#039;string&#039; &amp;&amp;
+          Path.isPath(value.path)
+        )
+      case &#039;set_node&#039;:
+        return (
+          Path.isPath(value.path) &amp;&amp;
+          isPlainObject(value.properties) &amp;&amp;
+          isPlainObject(value.newProperties)
+        )
+      case &#039;set_selection&#039;:
+        return (
+          (value.properties === null &amp;&amp; Range.isRange(value.newProperties)) ||
+          (value.newProperties === null &amp;&amp; Range.isRange(value.properties)) ||
+          (isPlainObject(value.properties) &amp;&amp;
+            isPlainObject(value.newProperties))
+        )
+      case &#039;split_node&#039;:
+        return (
+          Path.isPath(value.path) &amp;&amp;
+          typeof value.position === &#039;number&#039; &amp;&amp;
+          isPlainObject(value.properties)
+        )
+      default:
+        return false
+    }
+  },
+
+  /**
+   * Check if a value is a list of `Operation` objects.
+   */
+
+  isOperationList(value: any): value is Operation[] {
+    return (
+      Array.isArray(value) &amp;&amp;
+      (value.length === 0 || Operation.isOperation(value[0]))
+    )
+  },
+
+  /**
+   * Check of a value is a `SelectionOperation` object.
+   */
+
+  isSelectionOperation(value: any): value is SelectionOperation {
+    return Operation.isOperation(value) &amp;&amp; value.type.endsWith(&#039;_selection&#039;)
+  },
+
+  /**
+   * Check of a value is a `TextOperation` object.
+   */
+
+  isTextOperation(value: any): value is TextOperation {
+    return Operation.isOperation(value) &amp;&amp; value.type.endsWith(&#039;_text&#039;)
+  },
+
+  /**
+   * Invert an operation, returning a new operation that will exactly undo the
+   * original when applied.
+   */
+
+  inverse(op: Operation): Operation {
+    switch (op.type) {
+      case &#039;insert_node&#039;: {
+        return { ...op, type: &#039;remove_node&#039; }
+      }
+
+      case &#039;insert_text&#039;: {
+        return { ...op, type: &#039;remove_text&#039; }
+      }
+
+      case &#039;merge_node&#039;: {
+        return { ...op, type: &#039;split_node&#039;, path: Path.previous(op.path) }
+      }
+
+      case &#039;move_node&#039;: {
+        const { newPath, path } = op
+
+        // PERF: in this case the move operation is a no-op anyways.
+        if (Path.equals(newPath, path)) {
+          return op
+        }
+
+        // If the move happens completely within a single parent the path and
+        // newPath are stable with respect to each other.
+        if (Path.isSibling(path, newPath)) {
+          return { ...op, path: newPath, newPath: path }
+        }
+
+        // If the move does not happen within a single parent it is possible
+        // for the move to impact the true path to the location where the node
+        // was removed from and where it was inserted. We have to adjust for this
+        // and find the original path. We can accomplish this (only in non-sibling)
+        // moves by looking at the impact of the move operation on the node
+        // after the original move path.
+        const inversePath = Path.transform(path, op)!
+        const inverseNewPath = Path.transform(Path.next(path), op)!
+        return { ...op, path: inversePath, newPath: inverseNewPath }
+      }
+
+      case &#039;remove_node&#039;: {
+        return { ...op, type: &#039;insert_node&#039; }
+      }
+
+      case &#039;remove_text&#039;: {
+        return { ...op, type: &#039;insert_text&#039; }
+      }
+
+      case &#039;set_node&#039;: {
+        const { properties, newProperties } = op
+        return { ...op, properties: newProperties, newProperties: properties }
+      }
+
+      case &#039;set_selection&#039;: {
+        const { properties, newProperties } = op
+
+        if (properties == null) {
+          return {
+            ...op,
+            properties: newProperties as Range,
+            newProperties: null,
+          }
+        } else if (newProperties == null) {
+          return {
+            ...op,
+            properties: null,
+            newProperties: properties as Range,
+          }
+        } else {
+          return { ...op, properties: newProperties, newProperties: properties }
+        }
+      }
+
+      case &#039;split_node&#039;: {
+        return { ...op, type: &#039;merge_node&#039;, path: Path.next(op.path) }
+      }
+    }
+  },
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

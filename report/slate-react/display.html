@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - JavaScript Introspection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <script>
+    var __options = {"title":"slate-react package analysis","flags":{"complexity":{"ecmaFeatures":{"arrowFunctions":true,"blockBindings":true,"destructuring":true,"regexYFlag":true,"regexUFlag":true,"templateStrings":true,"binaryLiterals":true,"octalLiterals":true,"unicodeCodePointEscapes":true,"defaultParams":true,"restParams":true,"forOf":true,"objectLiteralComputedProperties":true,"objectLiteralShorthandMethods":true,"objectLiteralShorthandProperties":true,"objectLiteralDuplicateProperties":true,"generators":true,"spread":true,"classes":true,"modules":true,"jsx":true,"globalReturn":true,"experimentalObjectRestSpread":true},"sourceType":"module","ecmaVersion":6,"loc":true,"newmi":true,"range":true},"eslint":{"rules":{"quotes":[2,"single"],"semi":[2,"always"],"curly":["error"],"no-dupe-keys":2,"func-names":[1,"always"]},"env":{"es6":true,"browser":true},"globals":["__dirname","module","exports","process","require"],"parserOptions":{"sourceType":"module","ecmaFeatures":{"jsx":true,"experimentalObjectRestSpread":true,"modules":true}}}}}
+  </script>
+
+  <link href="./assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/plato-display.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div class="container">
+    <h1>slate-react package analysis</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="reportBlock lineCount">
+                <div class="reportContent">
+                    <small class="chart-label">Total / Average Lines</small>
+                    <h1>2902 / 126</h1>
+                </div>
+                <div id="chart_historical_sloc" class="chart js-chart"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="reportBlock maintainability">
+                <div class="reportContent">
+                    <small class="chart-label">Average Maintainability</small>
+                    <h1>67.56</h1>
+                </div>
+                <div id="chart_historical_maint" class="chart js-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="reportBlock maintainabilityList">
+                <h2 class="reportTitle">Worst Maintainability Scores</h2>
+                <ul class="list-unstyled">
+                  
+                    <li>
+                        <strong>25 score</strong>
+                        <small>packages/slate-react/src/plugin/react-editor.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>48 score</strong>
+                        <small>packages/slate-react/src/utils/hotkeys.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>50 score</strong>
+                        <small>packages/slate-react/src/components/editable.tsx</small>
+                    </li>
+                    
+                    <li>
+                        <strong>51 score</strong>
+                        <small>packages/slate-react/src/components/children.tsx</small>
+                    </li>
+                    
+                    <li>
+                        <strong>55 score</strong>
+                        <small>packages/slate-react/src/plugin/with-react.ts</small>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="reportBlock locList">
+                <h2 class="reportTitle">Largest Files</h2>
+                <ul class="list-unstyled">
+                    
+                    <li>
+                        <strong>1081 lines</strong>
+                        <small>packages/slate-react/src/components/editable.tsx</small>
+                    </li>
+                    
+                    <li>
+                        <strong>524 lines</strong>
+                        <small>packages/slate-react/src/plugin/react-editor.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>190 lines</strong>
+                        <small>packages/slate-react/src/plugin/with-react.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>188 lines</strong>
+                        <small>packages/slate-react/src/components/element.tsx</small>
+                    </li>
+                    
+                    <li>
+                        <strong>177 lines</strong>
+                        <small>packages/slate-react/src/utils/dom.ts</small>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="reportBlock lintList">
+                <h2 class="reportTitle">Lint Warnings</h2>
+                <ul class="list-unstyled">
+                  
+                    <li>
+                        <strong>241 lint errors</strong>
+                        <small>packages/slate-react/src/components/editable.tsx</small>
+                   </li>
+                   
+                    <li>
+                        <strong>151 lint errors</strong>
+                        <small>packages/slate-react/src/plugin/react-editor.ts</small>
+                   </li>
+                   
+                    <li>
+                        <strong>77 lint errors</strong>
+                        <small>packages/slate-react/src/plugin/with-react.ts</small>
+                   </li>
+                   
+                    <li>
+                        <strong>51 lint errors</strong>
+                        <small>packages/slate-react/src/components/element.tsx</small>
+                   </li>
+                   
+                    <li>
+                        <strong>46 lint errors</strong>
+                        <small>packages/slate-react/src/utils/dom.ts</small>
+                   </li>
+                   
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script type="text/javascript" src="assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="assets/scripts/plato-display.js"></script>
+
+</body>
+</html>

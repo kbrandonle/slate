@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-hyperscript/src/creators.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-hyperscript/src/creators.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">57.23</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">279</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">64.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.32</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import {
+  Element,
+  Descendant,
+  Node,
+  Range,
+  Text,
+  Editor,
+  createEditor as makeEditor,
+} from &#039;slate&#039;
+import {
+  AnchorToken,
+  FocusToken,
+  Token,
+  addAnchorToken,
+  addFocusToken,
+  getAnchorOffset,
+  getFocusOffset,
+} from &#039;./tokens&#039;
+
+/**
+ * Resolve the descedants of a node by normalizing the children that can be
+ * passed into a hyperscript creator function.
+ */
+
+const STRINGS: WeakSet&lt;Text&gt; = new WeakSet()
+
+const resolveDescendants = (children: any[]): Descendant[] =&gt; {
+  const nodes: Node[] = []
+
+  const addChild = (child: Node | Token): void =&gt; {
+    if (child == null) {
+      return
+    }
+
+    const prev = nodes[nodes.length - 1]
+
+    if (typeof child === &#039;string&#039;) {
+      const text = { text: child }
+      STRINGS.add(text)
+      child = text
+    }
+
+    if (Text.isText(child)) {
+      const c = child // HACK: fix typescript complaining
+
+      if (
+        Text.isText(prev) &amp;&amp;
+        STRINGS.has(prev) &amp;&amp;
+        STRINGS.has(c) &amp;&amp;
+        Text.equals(prev, c, { loose: true })
+      ) {
+        prev.text += c.text
+      } else {
+        nodes.push(c)
+      }
+    } else if (Element.isElement(child)) {
+      nodes.push(child)
+    } else if (child instanceof Token) {
+      let n = nodes[nodes.length - 1]
+
+      if (!Text.isText(n)) {
+        addChild(&#039;&#039;)
+        n = nodes[nodes.length - 1] as Text
+      }
+
+      if (child instanceof AnchorToken) {
+        addAnchorToken(n, child)
+      } else if (child instanceof FocusToken) {
+        addFocusToken(n, child)
+      }
+    } else {
+      throw new Error(`Unexpected hyperscript child object: ${child}`)
+    }
+  }
+
+  for (const child of children.flat(Infinity)) {
+    addChild(child)
+  }
+
+  return nodes
+}
+
+/**
+ * Create an anchor token.
+ */
+
+export function createAnchor(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): AnchorToken {
+  return new AnchorToken(attributes)
+}
+
+/**
+ * Create an anchor and a focus token.
+ */
+
+export function createCursor(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Token[] {
+  return [new AnchorToken(attributes), new FocusToken(attributes)]
+}
+
+/**
+ * Create an `Element` object.
+ */
+
+export function createElement(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Element {
+  return { ...attributes, children: resolveDescendants(children) }
+}
+
+/**
+ * Create a focus token.
+ */
+
+export function createFocus(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): FocusToken {
+  return new FocusToken(attributes)
+}
+
+/**
+ * Create a fragment.
+ */
+
+export function createFragment(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Descendant[] {
+  return resolveDescendants(children)
+}
+
+/**
+ * Create a `Selection` object.
+ */
+
+export function createSelection(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Range {
+  const anchor: AnchorToken = children.find(c =&gt; c instanceof AnchorToken)
+  const focus: FocusToken = children.find(c =&gt; c instanceof FocusToken)
+
+  if (!anchor || anchor.offset == null || anchor.path == null) {
+    throw new Error(
+      `The &lt;selection&gt; hyperscript tag must have an &lt;anchor&gt; tag as a child with \`path\` and \`offset\` attributes defined.`
+    )
+  }
+
+  if (!focus || focus.offset == null || focus.path == null) {
+    throw new Error(
+      `The &lt;selection&gt; hyperscript tag must have a &lt;focus&gt; tag as a child with \`path\` and \`offset\` attributes defined.`
+    )
+  }
+
+  return {
+    anchor: {
+      offset: anchor.offset,
+      path: anchor.path,
+    },
+    focus: {
+      offset: focus.offset,
+      path: focus.path,
+    },
+    ...attributes,
+  }
+}
+
+/**
+ * Create a `Text` object.
+ */
+
+export function createText(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Text {
+  const nodes = resolveDescendants(children)
+
+  if (nodes.length &gt; 1) {
+    throw new Error(
+      `The &lt;text&gt; hyperscript tag must only contain a single node&#039;s worth of children.`
+    )
+  }
+
+  let [node] = nodes
+
+  if (node == null) {
+    node = { text: &#039;&#039; }
+  }
+
+  if (!Text.isText(node)) {
+    throw new Error(`
+    The &lt;text&gt; hyperscript tag can only contain text content as children.`)
+  }
+
+  // COMPAT: If they used the &lt;text&gt; tag we want to guarantee that it won&#039;t be
+  // merge with other string children.
+  STRINGS.delete(node)
+
+  Object.assign(node, attributes)
+  return node
+}
+
+/**
+ * Create a top-level `Editor` object.
+ */
+
+export function createEditor(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): Editor {
+  const otherChildren: any[] = []
+  let selectionChild: Range | undefined
+
+  for (const child of children) {
+    if (Range.isRange(child)) {
+      selectionChild = child
+    } else {
+      otherChildren.push(child)
+    }
+  }
+
+  const descendants = resolveDescendants(otherChildren)
+  const selection: Partial&lt;Range&gt; = {}
+  const editor = makeEditor()
+  Object.assign(editor, attributes)
+  editor.children = descendants
+
+  // Search the document&#039;s texts to see if any of them have tokens associated
+  // that need incorporated into the selection.
+  for (const [node, path] of Node.texts(editor)) {
+    const anchor = getAnchorOffset(node)
+    const focus = getFocusOffset(node)
+
+    if (anchor != null) {
+      const [offset] = anchor
+      selection.anchor = { path, offset }
+    }
+
+    if (focus != null) {
+      const [offset] = focus
+      selection.focus = { path, offset }
+    }
+  }
+
+  if (selection.anchor &amp;&amp; !selection.focus) {
+    throw new Error(
+      `Slate hyperscript ranges must have both \`&lt;anchor /&gt;\` and \`&lt;focus /&gt;\` defined if one is defined, but you only defined \`&lt;anchor /&gt;\`. For collapsed selections, use \`&lt;cursor /&gt;\` instead.`
+    )
+  }
+
+  if (!selection.anchor &amp;&amp; selection.focus) {
+    throw new Error(
+      `Slate hyperscript ranges must have both \`&lt;anchor /&gt;\` and \`&lt;focus /&gt;\` defined if one is defined, but you only defined \`&lt;focus /&gt;\`. For collapsed selections, use \`&lt;cursor /&gt;\` instead.`
+    )
+  }
+
+  if (selectionChild != null) {
+    editor.selection = selectionChild
+  } else if (Range.isRange(selection)) {
+    editor.selection = selection
+  }
+
+  return editor
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

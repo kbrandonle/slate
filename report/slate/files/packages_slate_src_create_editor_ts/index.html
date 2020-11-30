@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate/src/create-editor.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate/src/create-editor.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">53.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">377</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">77.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.98</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import {
+  Descendant,
+  Editor,
+  Element,
+  Node,
+  NodeEntry,
+  Operation,
+  Path,
+  PathRef,
+  PointRef,
+  Range,
+  RangeRef,
+  Text,
+  Transforms,
+} from &#039;./&#039;
+import { DIRTY_PATHS, FLUSHING } from &#039;./utils/weak-maps&#039;
+
+/**
+ * Create a new Slate `Editor` object.
+ */
+
+export const createEditor = (): Editor =&gt; {
+  const editor: Editor = {
+    children: [],
+    operations: [],
+    selection: null,
+    marks: null,
+    isInline: () =&gt; false,
+    isVoid: () =&gt; false,
+    onChange: () =&gt; {},
+
+    apply: (op: Operation) =&gt; {
+      for (const ref of Editor.pathRefs(editor)) {
+        PathRef.transform(ref, op)
+      }
+
+      for (const ref of Editor.pointRefs(editor)) {
+        PointRef.transform(ref, op)
+      }
+
+      for (const ref of Editor.rangeRefs(editor)) {
+        RangeRef.transform(ref, op)
+      }
+
+      const set = new Set()
+      const dirtyPaths: Path[] = []
+
+      const add = (path: Path | null) =&gt; {
+        if (path) {
+          const key = path.join(&#039;,&#039;)
+
+          if (!set.has(key)) {
+            set.add(key)
+            dirtyPaths.push(path)
+          }
+        }
+      }
+
+      const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
+      const newDirtyPaths = getDirtyPaths(op)
+
+      for (const path of oldDirtyPaths) {
+        const newPath = Path.transform(path, op)
+        add(newPath)
+      }
+
+      for (const path of newDirtyPaths) {
+        add(path)
+      }
+
+      DIRTY_PATHS.set(editor, dirtyPaths)
+      Transforms.transform(editor, op)
+      editor.operations.push(op)
+      Editor.normalize(editor)
+
+      // Clear any formats applied to the cursor if the selection changes.
+      if (op.type === &#039;set_selection&#039;) {
+        editor.marks = null
+      }
+
+      if (!FLUSHING.get(editor)) {
+        FLUSHING.set(editor, true)
+
+        Promise.resolve().then(() =&gt; {
+          FLUSHING.set(editor, false)
+          editor.onChange()
+          editor.operations = []
+        })
+      }
+    },
+
+    addMark: (key: string, value: any) =&gt; {
+      const { selection } = editor
+
+      if (selection) {
+        if (Range.isExpanded(selection)) {
+          Transforms.setNodes(
+            editor,
+            { [key]: value },
+            { match: Text.isText, split: true }
+          )
+        } else {
+          const marks = {
+            ...(Editor.marks(editor) || {}),
+            [key]: value,
+          }
+
+          editor.marks = marks
+          editor.onChange()
+        }
+      }
+    },
+
+    deleteBackward: (unit: &#039;character&#039; | &#039;word&#039; | &#039;line&#039; | &#039;block&#039;) =&gt; {
+      const { selection } = editor
+
+      if (selection &amp;&amp; Range.isCollapsed(selection)) {
+        Transforms.delete(editor, { unit, reverse: true })
+      }
+    },
+
+    deleteForward: (unit: &#039;character&#039; | &#039;word&#039; | &#039;line&#039; | &#039;block&#039;) =&gt; {
+      const { selection } = editor
+
+      if (selection &amp;&amp; Range.isCollapsed(selection)) {
+        Transforms.delete(editor, { unit })
+      }
+    },
+
+    deleteFragment: () =&gt; {
+      const { selection } = editor
+
+      if (selection &amp;&amp; Range.isExpanded(selection)) {
+        Transforms.delete(editor)
+      }
+    },
+
+    getFragment: () =&gt; {
+      const { selection } = editor
+
+      if (selection) {
+        return Node.fragment(editor, selection)
+      }
+      return []
+    },
+
+    insertBreak: () =&gt; {
+      Transforms.splitNodes(editor, { always: true })
+    },
+
+    insertFragment: (fragment: Node[]) =&gt; {
+      Transforms.insertFragment(editor, fragment)
+    },
+
+    insertNode: (node: Node) =&gt; {
+      Transforms.insertNodes(editor, node)
+    },
+
+    insertText: (text: string) =&gt; {
+      const { selection, marks } = editor
+
+      if (selection) {
+        // If the cursor is at the end of an inline, move it outside of
+        // the inline before inserting
+        if (Range.isCollapsed(selection)) {
+          const inline = Editor.above(editor, {
+            match: n =&gt; Editor.isInline(editor, n),
+            mode: &#039;highest&#039;,
+          })
+
+          if (inline) {
+            const [, inlinePath] = inline
+
+            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+              const point = Editor.after(editor, inlinePath)!
+              Transforms.setSelection(editor, {
+                anchor: point,
+                focus: point,
+              })
+            }
+          }
+        }
+
+        if (marks) {
+          const node = { text, ...marks }
+          Transforms.insertNodes(editor, node)
+        } else {
+          Transforms.insertText(editor, text)
+        }
+
+        editor.marks = null
+      }
+    },
+
+    normalizeNode: (entry: NodeEntry) =&gt; {
+      const [node, path] = entry
+
+      // There are no core normalizations for text nodes.
+      if (Text.isText(node)) {
+        return
+      }
+
+      // Ensure that block and inline nodes have at least one text child.
+      if (Element.isElement(node) &amp;&amp; node.children.length === 0) {
+        const child = { text: &#039;&#039; }
+        Transforms.insertNodes(editor, child, {
+          at: path.concat(0),
+          voids: true,
+        })
+        return
+      }
+
+      // Determine whether the node should have block or inline children.
+      const shouldHaveInlines = Editor.isEditor(node)
+        ? false
+        : Element.isElement(node) &amp;&amp;
+          (editor.isInline(node) ||
+            node.children.length === 0 ||
+            Text.isText(node.children[0]) ||
+            editor.isInline(node.children[0]))
+
+      // Since we&#039;ll be applying operations while iterating, keep track of an
+      // index that accounts for any added/removed nodes.
+      let n = 0
+
+      for (let i = 0; i &lt; node.children.length; i++, n++) {
+        const child = node.children[i] as Descendant
+        const prev = node.children[i - 1] as Descendant
+        const isLast = i === node.children.length - 1
+        const isInlineOrText =
+          Text.isText(child) ||
+          (Element.isElement(child) &amp;&amp; editor.isInline(child))
+
+        // Only allow block nodes in the top-level children and parent blocks
+        // that only contain block nodes. Similarly, only allow inline nodes in
+        // other inline nodes, or parent blocks that only contain inlines and
+        // text.
+        if (isInlineOrText !== shouldHaveInlines) {
+          Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
+          n--
+        } else if (Element.isElement(child)) {
+          // Ensure that inline nodes are surrounded by text nodes.
+          if (editor.isInline(child)) {
+            if (prev == null || !Text.isText(prev)) {
+              const newChild = { text: &#039;&#039; }
+              Transforms.insertNodes(editor, newChild, {
+                at: path.concat(n),
+                voids: true,
+              })
+              n++
+            } else if (isLast) {
+              const newChild = { text: &#039;&#039; }
+              Transforms.insertNodes(editor, newChild, {
+                at: path.concat(n + 1),
+                voids: true,
+              })
+              n++
+            }
+          }
+        } else {
+          // Merge adjacent text nodes that are empty or match.
+          if (prev != null &amp;&amp; Text.isText(prev)) {
+            if (Text.equals(child, prev, { loose: true })) {
+              Transforms.mergeNodes(editor, { at: path.concat(n), voids: true })
+              n--
+            } else if (prev.text === &#039;&#039;) {
+              Transforms.removeNodes(editor, {
+                at: path.concat(n - 1),
+                voids: true,
+              })
+              n--
+            } else if (isLast &amp;&amp; child.text === &#039;&#039;) {
+              Transforms.removeNodes(editor, {
+                at: path.concat(n),
+                voids: true,
+              })
+              n--
+            }
+          }
+        }
+      }
+    },
+
+    removeMark: (key: string) =&gt; {
+      const { selection } = editor
+
+      if (selection) {
+        if (Range.isExpanded(selection)) {
+          Transforms.unsetNodes(editor, key, {
+            match: Text.isText,
+            split: true,
+          })
+        } else {
+          const marks = { ...(Editor.marks(editor) || {}) }
+          delete marks[key]
+          editor.marks = marks
+          editor.onChange()
+        }
+      }
+    },
+  }
+
+  return editor
+}
+
+/**
+ * Get the &quot;dirty&quot; paths generated from an operation.
+ */
+
+const getDirtyPaths = (op: Operation) =&gt; {
+  switch (op.type) {
+    case &#039;insert_text&#039;:
+    case &#039;remove_text&#039;:
+    case &#039;set_node&#039;: {
+      const { path } = op
+      return Path.levels(path)
+    }
+
+    case &#039;insert_node&#039;: {
+      const { node, path } = op
+      const levels = Path.levels(path)
+      const descendants = Text.isText(node)
+        ? []
+        : Array.from(Node.nodes(node), ([, p]) =&gt; path.concat(p))
+
+      return [...levels, ...descendants]
+    }
+
+    case &#039;merge_node&#039;: {
+      const { path } = op
+      const ancestors = Path.ancestors(path)
+      const previousPath = Path.previous(path)
+      return [...ancestors, previousPath]
+    }
+
+    case &#039;move_node&#039;: {
+      const { path, newPath } = op
+
+      if (Path.equals(path, newPath)) {
+        return []
+      }
+
+      const oldAncestors: Path[] = []
+      const newAncestors: Path[] = []
+
+      for (const ancestor of Path.ancestors(path)) {
+        const p = Path.transform(ancestor, op)
+        oldAncestors.push(p!)
+      }
+
+      for (const ancestor of Path.ancestors(newPath)) {
+        const p = Path.transform(ancestor, op)
+        newAncestors.push(p!)
+      }
+
+      return [...oldAncestors, ...newAncestors]
+    }
+
+    case &#039;remove_node&#039;: {
+      const { path } = op
+      const ancestors = Path.ancestors(path)
+      return [...ancestors]
+    }
+
+    case &#039;split_node&#039;: {
+      const { path } = op
+      const levels = Path.levels(path)
+      const nextPath = Path.next(path)
+      return [...levels, nextPath]
+    }
+
+    default: {
+      return []
+    }
+  }
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

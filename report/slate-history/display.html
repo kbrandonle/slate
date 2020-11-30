@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - JavaScript Introspection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <script>
+    var __options = {"title":"slate-history package analysis","flags":{"complexity":{"ecmaFeatures":{"arrowFunctions":true,"blockBindings":true,"destructuring":true,"regexYFlag":true,"regexUFlag":true,"templateStrings":true,"binaryLiterals":true,"octalLiterals":true,"unicodeCodePointEscapes":true,"defaultParams":true,"restParams":true,"forOf":true,"objectLiteralComputedProperties":true,"objectLiteralShorthandMethods":true,"objectLiteralShorthandProperties":true,"objectLiteralDuplicateProperties":true,"generators":true,"spread":true,"classes":true,"modules":true,"jsx":true,"globalReturn":true,"experimentalObjectRestSpread":true},"sourceType":"module","ecmaVersion":6,"loc":true,"newmi":true,"range":true},"eslint":{"rules":{"quotes":[2,"single"],"semi":[2,"always"],"curly":["error"],"no-dupe-keys":2,"func-names":[1,"always"]},"env":{"es6":true,"browser":true},"globals":["__dirname","module","exports","process","require"],"parserOptions":{"sourceType":"module","ecmaFeatures":{"jsx":true,"experimentalObjectRestSpread":true,"modules":true}}}}}
+  </script>
+
+  <link href="./assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="./assets/css/plato-display.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div class="container">
+    <h1>slate-history package analysis</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="reportBlock lineCount">
+                <div class="reportContent">
+                    <small class="chart-label">Total / Average Lines</small>
+                    <h1>306 / 77</h1>
+                </div>
+                <div id="chart_historical_sloc" class="chart js-chart"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="reportBlock maintainability">
+                <div class="reportContent">
+                    <small class="chart-label">Average Maintainability</small>
+                    <h1>67.73</h1>
+                </div>
+                <div id="chart_historical_maint" class="chart js-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="reportBlock maintainabilityList">
+                <h2 class="reportTitle">Worst Maintainability Scores</h2>
+                <ul class="list-unstyled">
+                  
+                    <li>
+                        <strong>49 score</strong>
+                        <small>packages/slate-history/src/history-editor.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>60 score</strong>
+                        <small>packages/slate-history/src/with-history.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>62 score</strong>
+                        <small>packages/slate-history/src/history.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>100 score</strong>
+                        <small>packages/slate-history/src/index.ts</small>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="reportBlock locList">
+                <h2 class="reportTitle">Largest Files</h2>
+                <ul class="list-unstyled">
+                    
+                    <li>
+                        <strong>186 lines</strong>
+                        <small>packages/slate-history/src/with-history.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>87 lines</strong>
+                        <small>packages/slate-history/src/history-editor.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>29 lines</strong>
+                        <small>packages/slate-history/src/history.ts</small>
+                    </li>
+                    
+                    <li>
+                        <strong>4 lines</strong>
+                        <small>packages/slate-history/src/index.ts</small>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="reportBlock lintList">
+                <h2 class="reportTitle">Lint Warnings</h2>
+                <ul class="list-unstyled">
+                  
+                    <li>
+                        <strong>60 lint errors</strong>
+                        <small>packages/slate-history/src/with-history.ts</small>
+                   </li>
+                   
+                    <li>
+                        <strong>19 lint errors</strong>
+                        <small>packages/slate-history/src/history-editor.ts</small>
+                   </li>
+                   
+                    <li>
+                        <strong>4 lint errors</strong>
+                        <small>packages/slate-history/src/history.ts</small>
+                   </li>
+                   
+                    <li>
+                        <strong>3 lint errors</strong>
+                        <small>packages/slate-history/src/index.ts</small>
+                   </li>
+                   
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script type="text/javascript" src="assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="assets/scripts/plato-display.js"></script>
+
+</body>
+</html>
