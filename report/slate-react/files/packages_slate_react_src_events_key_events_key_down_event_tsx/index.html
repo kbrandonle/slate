@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-react/src/events/key-events/key-down-event.tsx</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-react/src/events/key-events/key-down-event.tsx</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.13</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">209</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">33.39</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.15</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { ReactEditor } from &#039;slate-react/src/plugin/react-editor&#039;
+import Hotkeys from &#039;slate-react/src/utils/hotkeys&#039;
+import { Editor, SlateRange, Transforms } from &#039;slate&#039;
+
+export function handleKeyDownEvent(props: any) {
+  const editor: ReactEditor = props.editor
+  const event: React.KeyboardEvent&lt;HTMLDivElement&gt; = props.event
+
+  if (
+    !props.readOnly &amp;&amp;
+    props.hasEditableTarget(editor, event.target) &amp;&amp;
+    !props.isEventHandled(event, props.attributes.onKeyDown)
+  ) {
+    const { nativeEvent } = event
+    const { selection } = editor
+
+    // COMPAT: Since we prevent the default behavior on
+    // `beforeinput` events, the browser doesn&#039;t think there&#039;s ever
+    // any history stack to undo or redo, so we have to manage these
+    // hotkeys ourselves. (2019/11/06)
+    if (Hotkeys.isRedo(nativeEvent)) {
+      event.preventDefault()
+
+      if (typeof editor.redo === &#039;function&#039;) {
+        editor.redo()
+      }
+
+      return
+    }
+
+    if (Hotkeys.isUndo(nativeEvent)) {
+      event.preventDefault()
+
+      if (typeof editor.undo === &#039;function&#039;) {
+        editor.undo()
+      }
+
+      return
+    }
+
+    // COMPAT: Certain browsers don&#039;t handle the selection updates
+    // properly. In Chrome, the selection isn&#039;t properly extended.
+    // And in Firefox, the selection isn&#039;t properly collapsed.
+    // (2017/10/17)
+    if (Hotkeys.isMoveLineBackward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, { unit: &#039;line&#039;, reverse: true })
+      return
+    }
+
+    if (Hotkeys.isMoveLineForward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, { unit: &#039;line&#039; })
+      return
+    }
+
+    if (Hotkeys.isExtendLineBackward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, {
+        unit: &#039;line&#039;,
+        edge: &#039;focus&#039;,
+        reverse: true,
+      })
+      return
+    }
+
+    if (Hotkeys.isExtendLineForward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, { unit: &#039;line&#039;, edge: &#039;focus&#039; })
+      return
+    }
+
+    // COMPAT: If a void node is selected, or a zero-width text node
+    // adjacent to an inline is selected, we need to handle these
+    // hotkeys manually because browsers won&#039;t be able to skip over
+    // the void node with the zero-width space not being an empty
+    // string.
+    if (Hotkeys.isMoveBackward(nativeEvent)) {
+      event.preventDefault()
+
+      if (selection &amp;&amp; SlateRange.isCollapsed(selection)) {
+        Transforms.move(editor, { reverse: true })
+      } else {
+        Transforms.collapse(editor, { edge: &#039;start&#039; })
+      }
+
+      return
+    }
+
+    if (Hotkeys.isMoveForward(nativeEvent)) {
+      event.preventDefault()
+
+      if (selection &amp;&amp; SlateRange.isCollapsed(selection)) {
+        Transforms.move(editor)
+      } else {
+        Transforms.collapse(editor, { edge: &#039;end&#039; })
+      }
+
+      return
+    }
+
+    if (Hotkeys.isMoveWordBackward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, { unit: &#039;word&#039;, reverse: true })
+      return
+    }
+
+    if (Hotkeys.isMoveWordForward(nativeEvent)) {
+      event.preventDefault()
+      Transforms.move(editor, { unit: &#039;word&#039; })
+      return
+    }
+
+    // COMPAT: Certain browsers don&#039;t support the `beforeinput` event, so we
+    // fall back to guessing at the input intention for hotkeys.
+    // COMPAT: In iOS, some of these hotkeys are handled in the
+    if (!props.HAS_BEFORE_INPUT_SUPPORT) {
+      // We don&#039;t have a core behavior for these, but they change the
+      // DOM if we don&#039;t prevent them, so we have to.
+      if (
+        Hotkeys.isBold(nativeEvent) ||
+        Hotkeys.isItalic(nativeEvent) ||
+        Hotkeys.isTransposeCharacter(nativeEvent)
+      ) {
+        event.preventDefault()
+        return
+      }
+
+      if (Hotkeys.isSplitBlock(nativeEvent)) {
+        event.preventDefault()
+        Editor.insertBreak(editor)
+        return
+      }
+
+      if (Hotkeys.isDeleteBackward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteBackward(editor)
+        }
+
+        return
+      }
+
+      if (Hotkeys.isDeleteForward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteForward(editor)
+        }
+
+        return
+      }
+
+      if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteBackward(editor, { unit: &#039;line&#039; })
+        }
+
+        return
+      }
+
+      if (Hotkeys.isDeleteLineForward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteForward(editor, { unit: &#039;line&#039; })
+        }
+
+        return
+      }
+
+      if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteBackward(editor, { unit: &#039;word&#039; })
+        }
+
+        return
+      }
+
+      if (Hotkeys.isDeleteWordForward(nativeEvent)) {
+        event.preventDefault()
+
+        if (selection &amp;&amp; SlateRange.isExpanded(selection)) {
+          Editor.deleteFragment(editor)
+        } else {
+          Editor.deleteForward(editor, { unit: &#039;word&#039; })
+        }
+
+        return
+      }
+    }
+  }
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

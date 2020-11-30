@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-react/src/plugin/with-react.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-react/src/plugin/with-react.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">54.66</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">197</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">24.26</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.38</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import ReactDOM from &#039;react-dom&#039;
+import {
+  Editor,
+  SlateNode,
+  Path,
+  Operation,
+  Transforms,
+  SlateRange,
+} from &#039;slate&#039;
+
+import { ReactEditor } from &#039;./react-editor&#039;
+import { Key } from &#039;../utils/key&#039;
+import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY } from &#039;../utils/weak-maps&#039;
+import { isDOMText, getPlainText } from &#039;../utils/dom&#039;
+
+/**
+ * `withReact` adds React and DOM specific behaviors to the editor.
+ */
+
+export const withReact = &lt;T extends Editor&gt;(editor: T) =&gt; {
+  const e = editor as T &amp; ReactEditor
+  const { apply, onChange } = e
+
+  e.apply = (op: Operation) =&gt; {
+    const matches: [Path, Key][] = []
+
+    switch (op.type) {
+      case &#039;insert_text&#039;:
+      case &#039;remove_text&#039;:
+      case &#039;set_node&#039;: {
+        for (const [node, path] of Editor.levels(e, { at: op.path })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.push([path, key])
+        }
+
+        break
+      }
+
+      case &#039;insert_node&#039;:
+      case &#039;remove_node&#039;:
+      case &#039;merge_node&#039;:
+      case &#039;split_node&#039;: {
+        for (const [node, path] of Editor.levels(e, {
+          at: Path.parent(op.path),
+        })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.push([path, key])
+        }
+
+        break
+      }
+
+      case &#039;move_node&#039;: {
+        // TODO
+        break
+      }
+    }
+
+    apply(op)
+
+    for (const [path, key] of matches) {
+      const [node] = Editor.node(e, path)
+      NODE_TO_KEY.set(node, key)
+    }
+  }
+
+  e.setFragmentData = (data: DataTransfer) =&gt; {
+    const { selection } = e
+
+    if (!selection) {
+      return
+    }
+
+    const [start, end] = SlateRange.edges(selection)
+    const startVoid = Editor.void(e, { at: start.path })
+    const endVoid = Editor.void(e, { at: end.path })
+
+    if (SlateRange.isCollapsed(selection) &amp;&amp; !startVoid) {
+      return
+    }
+
+    // Create a fake selection so that we can add a Base64-encoded copy of the
+    // fragment to the HTML, to decode on future pastes.
+    const domRange = ReactEditor.toDOMRange(e, selection)
+    let contents = domRange.cloneContents()
+    let attach = contents.childNodes[0] as HTMLElement
+
+    // Make sure attach is non-empty, since empty nodes will not get copied.
+    contents.childNodes.forEach(node =&gt; {
+      if (node.textContent &amp;&amp; node.textContent.trim() !== &#039;&#039;) {
+        attach = node as HTMLElement
+      }
+    })
+
+    // COMPAT: If the end node is a void node, we need to move the end of the
+    // range from the void node&#039;s spacer span, to the end of the void node&#039;s
+    // content, since the spacer is before void&#039;s content in the DOM.
+    if (endVoid) {
+      const [voidNode] = endVoid
+      const r = domRange.cloneRange()
+      const domNode = ReactEditor.toDOMNode(e, voidNode)
+      r.setEndAfter(domNode)
+      contents = r.cloneContents()
+    }
+
+    // COMPAT: If the start node is a void node, we need to attach the encoded
+    // fragment to the void node&#039;s content node instead of the spacer, because
+    // attaching it to empty `&lt;div&gt;/&lt;span&gt;` nodes will end up having it erased by
+    // most browsers. (2018/04/27)
+    if (startVoid) {
+      attach = contents.querySelector(&#039;[data-slate-spacer]&#039;)! as HTMLElement
+    }
+
+    // Remove any zero-width space spans from the cloned DOM so that they don&#039;t
+    // show up elsewhere when pasted.
+    Array.from(contents.querySelectorAll(&#039;[data-slate-zero-width]&#039;)).forEach(
+      zw =&gt; {
+        const isNewline = zw.getAttribute(&#039;data-slate-zero-width&#039;) === &#039;n&#039;
+        zw.textContent = isNewline ? &#039;\n&#039; : &#039;&#039;
+      }
+    )
+
+    // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
+    // in the HTML, and can be used for intra-Slate pasting. If it&#039;s a text
+    // node, wrap it in a `&lt;span&gt;` so we have something to set an attribute on.
+    if (isDOMText(attach)) {
+      const span = document.createElement(&#039;span&#039;)
+      // COMPAT: In Chrome and Safari, if we don&#039;t add the `white-space` style
+      // then leading and trailing spaces will be ignored. (2017/09/21)
+      span.style.whiteSpace = &#039;pre&#039;
+      span.appendChild(attach)
+      contents.appendChild(span)
+      attach = span
+    }
+
+    const fragment = e.getFragment()
+    const string = JSON.stringify(fragment)
+    const encoded = window.btoa(encodeURIComponent(string))
+    attach.setAttribute(&#039;data-slate-fragment&#039;, encoded)
+    data.setData(&#039;application/x-slate-fragment&#039;, encoded)
+
+    // Add the content to a &lt;div&gt; so that we can get its inner HTML.
+    const div = document.createElement(&#039;div&#039;)
+    div.appendChild(contents)
+    div.setAttribute(&#039;hidden&#039;, &#039;true&#039;)
+    document.body.appendChild(div)
+    data.setData(&#039;text/html&#039;, div.innerHTML)
+    data.setData(&#039;text/plain&#039;, getPlainText(div))
+    document.body.removeChild(div)
+  }
+
+  e.insertData = (data: DataTransfer) =&gt; {
+    const fragment = data.getData(&#039;application/x-slate-fragment&#039;)
+
+    if (fragment) {
+      const decoded = decodeURIComponent(window.atob(fragment))
+      const parsed = JSON.parse(decoded) as SlateNode[]
+      e.insertFragment(parsed)
+      return
+    }
+
+    const text = data.getData(&#039;text/plain&#039;)
+
+    if (text) {
+      const lines = text.split(/\r\n|\r|\n/)
+      let split = false
+
+      for (const line of lines) {
+        if (split) {
+          Transforms.splitNodes(e, { always: true })
+        }
+
+        e.insertText(line)
+        split = true
+      }
+    }
+  }
+
+  e.onChange = () =&gt; {
+    // COMPAT: React doesn&#039;t batch `setState` hook calls, which means that the
+    // children and selection can get out of sync for one render pass. So we
+    // have to use this unstable API to ensure it batches them. (2019/12/03)
+    // https://github.com/facebook/react/issues/14259#issuecomment-439702367
+    ReactDOM.unstable_batchedUpdates(() =&gt; {
+      const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
+
+      if (onContextChange) {
+        onContextChange()
+      }
+
+      onChange()
+    })
+  }
+
+  return e
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

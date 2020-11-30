@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-react/src/utils/hotkeys.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-react/src/utils/hotkeys.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">48.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">96</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">8.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.76</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { isKeyHotkey } from &#039;is-hotkey&#039;
+import { IS_APPLE } from &#039;./environment&#039;
+
+/**
+ * Hotkey mappings for each platform.
+ */
+
+const HOTKEYS = {
+  bold: &#039;mod+b&#039;,
+  compose: [&#039;down&#039;, &#039;left&#039;, &#039;right&#039;, &#039;up&#039;, &#039;backspace&#039;, &#039;enter&#039;],
+  moveBackward: &#039;left&#039;,
+  moveForward: &#039;right&#039;,
+  moveWordBackward: &#039;ctrl+left&#039;,
+  moveWordForward: &#039;ctrl+right&#039;,
+  deleteBackward: &#039;shift?+backspace&#039;,
+  deleteForward: &#039;shift?+delete&#039;,
+  extendBackward: &#039;shift+left&#039;,
+  extendForward: &#039;shift+right&#039;,
+  italic: &#039;mod+i&#039;,
+  splitBlock: &#039;shift?+enter&#039;,
+  undo: &#039;mod+z&#039;,
+}
+
+const APPLE_HOTKEYS = {
+  moveLineBackward: &#039;opt+up&#039;,
+  moveLineForward: &#039;opt+down&#039;,
+  moveWordBackward: &#039;opt+left&#039;,
+  moveWordForward: &#039;opt+right&#039;,
+  deleteBackward: [&#039;ctrl+backspace&#039;, &#039;ctrl+h&#039;],
+  deleteForward: [&#039;ctrl+delete&#039;, &#039;ctrl+d&#039;],
+  deleteLineBackward: &#039;cmd+shift?+backspace&#039;,
+  deleteLineForward: [&#039;cmd+shift?+delete&#039;, &#039;ctrl+k&#039;],
+  deleteWordBackward: &#039;opt+shift?+backspace&#039;,
+  deleteWordForward: &#039;opt+shift?+delete&#039;,
+  extendLineBackward: &#039;opt+shift+up&#039;,
+  extendLineForward: &#039;opt+shift+down&#039;,
+  redo: &#039;cmd+shift+z&#039;,
+  transposeCharacter: &#039;ctrl+t&#039;,
+}
+
+const WINDOWS_HOTKEYS = {
+  deleteWordBackward: &#039;ctrl+shift?+backspace&#039;,
+  deleteWordForward: &#039;ctrl+shift?+delete&#039;,
+  redo: [&#039;ctrl+y&#039;, &#039;ctrl+shift+z&#039;],
+}
+
+/**
+ * Create a platform-aware hotkey checker.
+ */
+
+const create = (key: string) =&gt; {
+  const generic = HOTKEYS[key]
+  const apple = APPLE_HOTKEYS[key]
+  const windows = WINDOWS_HOTKEYS[key]
+  const isGeneric = generic &amp;&amp; isKeyHotkey(generic)
+  const isApple = apple &amp;&amp; isKeyHotkey(apple)
+  const isWindows = windows &amp;&amp; isKeyHotkey(windows)
+
+  return (event: KeyboardEvent) =&gt; {
+    if (isGeneric &amp;&amp; isGeneric(event)) return true
+    if (IS_APPLE &amp;&amp; isApple &amp;&amp; isApple(event)) return true
+    if (!IS_APPLE &amp;&amp; isWindows &amp;&amp; isWindows(event)) return true
+    return false
+  }
+}
+
+/**
+ * Hotkeys.
+ */
+
+export default {
+  isBold: create(&#039;bold&#039;),
+  isCompose: create(&#039;compose&#039;),
+  isMoveBackward: create(&#039;moveBackward&#039;),
+  isMoveForward: create(&#039;moveForward&#039;),
+  isDeleteBackward: create(&#039;deleteBackward&#039;),
+  isDeleteForward: create(&#039;deleteForward&#039;),
+  isDeleteLineBackward: create(&#039;deleteLineBackward&#039;),
+  isDeleteLineForward: create(&#039;deleteLineForward&#039;),
+  isDeleteWordBackward: create(&#039;deleteWordBackward&#039;),
+  isDeleteWordForward: create(&#039;deleteWordForward&#039;),
+  isExtendBackward: create(&#039;extendBackward&#039;),
+  isExtendForward: create(&#039;extendForward&#039;),
+  isExtendLineBackward: create(&#039;extendLineBackward&#039;),
+  isExtendLineForward: create(&#039;extendLineForward&#039;),
+  isItalic: create(&#039;italic&#039;),
+  isMoveLineBackward: create(&#039;moveLineBackward&#039;),
+  isMoveLineForward: create(&#039;moveLineForward&#039;),
+  isMoveWordBackward: create(&#039;moveWordBackward&#039;),
+  isMoveWordForward: create(&#039;moveWordForward&#039;),
+  isRedo: create(&#039;redo&#039;),
+  isSplitBlock: create(&#039;splitBlock&#039;),
+  isTransposeCharacter: create(&#039;transposeCharacter&#039;),
+  isUndo: create(&#039;undo&#039;),
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

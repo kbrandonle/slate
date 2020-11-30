@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-react/src/utils/dom.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-react/src/utils/dom.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.43</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">185</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">41.11</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.93</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Types.
+ */
+
+// The syntax `import DOMNode1 = globalThis.Node` does not work with the test runner, there may be a workaround but I cannot find it.
+// To fix it, I renamed the slate `Node` type to `SlateNode` and the slate `Range` type to `SlateRange` to avoid conflicting with the global type.
+type DOMNode = globalThis.Node
+type DOMComment = globalThis.Comment
+type DOMElement = globalThis.Element
+type DOMText = globalThis.Text
+type DOMRange = globalThis.Range
+type DOMSelection = globalThis.Selection
+type DOMStaticRange = globalThis.StaticRange
+
+export {
+  DOMNode,
+  DOMComment,
+  DOMElement,
+  DOMText,
+  DOMRange,
+  DOMSelection,
+  DOMStaticRange,
+}
+
+export type DOMPoint = [Node, number]
+
+export type SlateRangeDescription = {
+  anchorNode: Node | null | undefined
+  anchorOffset: number | undefined
+  focusNode: Node | null | undefined
+  focusOffset: number | undefined
+  isCollapsed: boolean | undefined
+}
+
+/**
+ * Check if a DOM node is a comment node.
+ */
+
+export const isDOMComment = (value: any): value is DOMComment =&gt; {
+  return isDOMNode(value) &amp;&amp; value.nodeType === 8
+}
+
+/**
+ * Check if a DOM node is an element node.
+ */
+
+export const isDOMElement = (value: any): value is DOMElement =&gt; {
+  return isDOMNode(value) &amp;&amp; value.nodeType === 1
+}
+
+/**
+ * Check if a value is a DOM node.
+ */
+
+export const isDOMNode = (value: any): value is DOMNode =&gt; {
+  return value instanceof Node
+}
+
+/**
+ * Check if a DOM node is an element node.
+ */
+
+export const isDOMText = (value: any): value is DOMText =&gt; {
+  return isDOMNode(value) &amp;&amp; value.nodeType === 3
+}
+
+/**
+ * Checks whether a paste event is a plaintext-only event.
+ */
+
+export const isPlainTextOnlyPaste = (event: ClipboardEvent) =&gt; {
+  return (
+    event.clipboardData &amp;&amp;
+    event.clipboardData.getData(&#039;text/plain&#039;) !== &#039;&#039; &amp;&amp;
+    event.clipboardData.types.length === 1
+  )
+}
+
+/**
+ * Normalize a DOM point so that it always refers to a text node.
+ */
+
+export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint =&gt; {
+  let [node, offset] = domPoint
+
+  // If it&#039;s an element node, its offset refers to the index of its children
+  // including comment nodes, so try to find the right text child node.
+  if (isDOMElement(node) &amp;&amp; node.childNodes.length) {
+    const isLast = offset === node.childNodes.length
+    const direction = isLast ? &#039;backward&#039; : &#039;forward&#039;
+    const index = isLast ? offset - 1 : offset
+    node = getEditableChild(node, index, direction)
+
+    // If the node has children, traverse until we have a leaf node. Leaf nodes
+    // can be either text nodes, or other void DOM nodes.
+    while (isDOMElement(node) &amp;&amp; node.childNodes.length) {
+      const i = isLast ? node.childNodes.length - 1 : 0
+      node = getEditableChild(node, i, direction)
+    }
+
+    // Determine the new offset inside the text node.
+    offset = isLast &amp;&amp; node.textContent != null ? node.textContent.length : 0
+  }
+
+  // Return the node and offset.
+  return [node, offset]
+}
+
+/**
+ * Get the nearest editable child at `index` in a `parent`, preferring
+ * `direction`.
+ */
+
+export const getEditableChild = (
+  parent: DOMElement,
+  index: number,
+  direction: &#039;forward&#039; | &#039;backward&#039;
+): DOMNode =&gt; {
+  const { childNodes } = parent
+  let child = childNodes[index]
+  let i = index
+  let triedForward = false
+  let triedBackward = false
+
+  // While the child is a comment node, or an element node with no children,
+  // keep iterating to find a sibling non-void, non-comment node.
+  while (
+    isDOMComment(child) ||
+    (isDOMElement(child) &amp;&amp; child.childNodes.length === 0) ||
+    (isDOMElement(child) &amp;&amp; child.getAttribute(&#039;contenteditable&#039;) === &#039;false&#039;)
+  ) {
+    if (triedForward &amp;&amp; triedBackward) {
+      break
+    }
+
+    if (i &gt;= childNodes.length) {
+      triedForward = true
+      i = index - 1
+      direction = &#039;backward&#039;
+      continue
+    }
+
+    if (i &lt; 0) {
+      triedBackward = true
+      i = index + 1
+      direction = &#039;forward&#039;
+      continue
+    }
+
+    child = childNodes[i]
+    i += direction === &#039;forward&#039; ? 1 : -1
+  }
+
+  return child
+}
+
+/**
+ * Get a plaintext representation of the content of a node, accounting for block
+ * elements which get a newline appended.
+ *
+ * The domNode must be attached to the DOM.
+ */
+
+export const getPlainText = (domNode: DOMNode) =&gt; {
+  let text = &#039;&#039;
+
+  if (isDOMText(domNode) &amp;&amp; domNode.nodeValue) {
+    return domNode.nodeValue
+  }
+
+  if (isDOMElement(domNode)) {
+    for (const childNode of Array.from(domNode.childNodes)) {
+      text += getPlainText(childNode)
+    }
+
+    const display = getComputedStyle(domNode).getPropertyValue(&#039;display&#039;)
+
+    if (display === &#039;block&#039; || display === &#039;list&#039; || domNode.tagName === &#039;BR&#039;) {
+      text += &#039;\n&#039;
+    }
+  }
+
+  return text
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

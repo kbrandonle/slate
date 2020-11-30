@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate-react/src/components/editable.tsx</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate-react/src/components/editable.tsx</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">55.72</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">806</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">48.43</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.13</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import React, { useEffect, useRef, useMemo, useCallback } from &#039;react&#039;
+import {
+  Editor,
+  Element,
+  NodeEntry,
+  SlateNode,
+  SlateRange,
+  Text,
+  Transforms,
+  Path,
+} from &#039;slate&#039;
+import throttle from &#039;lodash/throttle&#039;
+import scrollIntoView from &#039;scroll-into-view-if-needed&#039;
+
+import Children from &#039;./children&#039;
+import Hotkeys from &#039;../utils/hotkeys&#039;
+import {
+  IS_FIREFOX,
+  IS_SAFARI,
+  IS_EDGE_LEGACY,
+  IS_CHROME_LEGACY,
+} from &#039;../utils/environment&#039;
+import { ReactEditor } from &#039;..&#039;
+import { ReadOnlyContext } from &#039;../hooks/use-read-only&#039;
+import { useSlate } from &#039;../hooks/use-slate&#039;
+import { useIsomorphicLayoutEffect } from &#039;../hooks/use-isomorphic-layout-effect&#039;
+import {
+  DOMElement,
+  DOMNode,
+  DOMRange,
+  isDOMElement,
+  isDOMNode,
+  isDOMText,
+  DOMStaticRange,
+  isPlainTextOnlyPaste,
+} from &#039;../utils/dom&#039;
+import {
+  EDITOR_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  IS_READ_ONLY,
+  NODE_TO_ELEMENT,
+  IS_FOCUSED,
+  PLACEHOLDER_SYMBOL,
+} from &#039;../utils/weak-maps&#039;
+
+import { handleClickEvent } from &#039;slate-react/src/events/mouse-events/click-event&#039;
+import { handleCopyEvent } from &#039;slate-react/src/events/editor-events/copy-event&#039;
+import { handleCutEvent } from &#039;slate-react/src/events/editor-events/cut-event&#039;
+import { handlePasteEvent } from &#039;slate-react/src/events/editor-events/paste-event&#039;
+import { handleKeyDownEvent } from &#039;slate-react/src/events/key-events/key-down-event&#039;
+import { handleOnBlurEvent } from &#039;slate-react/src/events/editor-events/blur-event&#039;
+import { handleDragStartEvent } from &#039;../events/mouse-events/drag-start-event&#039;
+import { handleDropEvent } from &#039;slate-react/src/events/mouse-events/on-drop-event&#039;
+import { handleOnFocusEvent } from &#039;slate-react/src/events/editor-events/focus-event&#039;
+import { handleDragOverEvent } from &#039;slate-react/src/events/mouse-events/drag-over-event&#039;
+import { handleCompositionStartEvent } from &#039;slate-react/src/events/editor-events/composition-start-event&#039;
+import { handleCompositionEndEvent } from &#039;slate-react/src/events/editor-events/composition-end-event&#039;
+import { handleBeforeInputEvent } from &#039;slate-react/src/events/editor-events/before-input-event&#039;
+
+// COMPAT: Firefox/Edge Legacy don&#039;t support the `beforeinput` event
+// Chrome Legacy doesn&#039;t support `beforeinput` correctly
+const HAS_BEFORE_INPUT_SUPPORT = !(
+  IS_FIREFOX ||
+  IS_EDGE_LEGACY ||
+  IS_CHROME_LEGACY
+)
+
+/**
+ * `RenderElementProps` are passed to the `renderElement` handler.
+ */
+
+export interface RenderElementProps {
+  children: any
+  element: Element
+  attributes: {
+    &#039;data-slate-node&#039;: &#039;element&#039;
+    &#039;data-slate-inline&#039;?: true
+    &#039;data-slate-void&#039;?: true
+    dir?: &#039;rtl&#039;
+    ref: any
+  }
+}
+
+/**
+ * `RenderLeafProps` are passed to the `renderLeaf` handler.
+ */
+
+export interface RenderLeafProps {
+  children: any
+  leaf: Text
+  text: Text
+  attributes: {
+    &#039;data-slate-leaf&#039;: true
+  }
+}
+
+/**
+ * `EditableProps` are passed to the `&lt;Editable&gt;` component.
+ */
+
+export type EditableProps = {
+  decorate?: (entry: NodeEntry) =&gt; SlateRange[]
+  onDOMBeforeInput?: (event: Event) =&gt; void
+  placeholder?: string
+  readOnly?: boolean
+  role?: string
+  style?: React.CSSProperties
+  renderElement?: (props: RenderElementProps) =&gt; JSX.Element
+  renderLeaf?: (props: RenderLeafProps) =&gt; JSX.Element
+  as?: React.ElementType
+} &amp; React.TextareaHTMLAttributes&lt;HTMLDivElement&gt;
+
+/**
+ * Editable.
+ */
+
+export const Editable = (props: EditableProps) =&gt; {
+  const {
+    autoFocus,
+    decorate = defaultDecorate,
+    onDOMBeforeInput: propsOnDOMBeforeInput,
+    placeholder,
+    readOnly = false,
+    renderElement,
+    renderLeaf,
+    style = {},
+    as: Component = &#039;div&#039;,
+    ...attributes
+  } = props
+  const editor = useSlate()
+  const ref = useRef&lt;HTMLDivElement&gt;(null)
+
+  // Update internal state on each render.
+  IS_READ_ONLY.set(editor, readOnly)
+
+  // Keep track of some state for the event handler logic.
+  const state = useMemo(
+    () =&gt; ({
+      isComposing: false,
+      isUpdatingSelection: false,
+      latestElement: null as DOMElement | null,
+    }),
+    []
+  )
+
+  // Update element-related weak maps with the DOM element ref.
+  useIsomorphicLayoutEffect(() =&gt; {
+    if (ref.current) {
+      EDITOR_TO_ELEMENT.set(editor, ref.current)
+      NODE_TO_ELEMENT.set(editor, ref.current)
+      ELEMENT_TO_NODE.set(ref.current, editor)
+    } else {
+      NODE_TO_ELEMENT.delete(editor)
+    }
+  })
+
+  // Whenever the editor updates, make sure the DOM selection state is in sync.
+  useIsomorphicLayoutEffect(() =&gt; {
+    const { selection } = editor
+    const domSelection = window.getSelection()
+
+    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
+      return
+    }
+
+    const hasDomSelection = domSelection.type !== &#039;None&#039;
+
+    // If the DOM selection is properly unset, we&#039;re done.
+    if (!selection &amp;&amp; !hasDomSelection) {
+      return
+    }
+
+    // verify that the dom selection is in the editor
+    const editorElement = EDITOR_TO_ELEMENT.get(editor)!
+    let hasDomSelectionInEditor = false
+    if (
+      editorElement.contains(domSelection.anchorNode) &amp;&amp;
+      editorElement.contains(domSelection.focusNode)
+    ) {
+      hasDomSelectionInEditor = true
+    }
+
+    // If the DOM selection is in the editor and the editor selection is already correct, we&#039;re done.
+    if (
+      hasDomSelection &amp;&amp;
+      hasDomSelectionInEditor &amp;&amp;
+      selection &amp;&amp;
+      SlateRange.equals(
+        ReactEditor.toSlateRange(editor, domSelection),
+        selection
+      )
+    ) {
+      return
+    }
+
+    // Otherwise the DOM selection is out of sync, so update it.
+    const el = ReactEditor.toDOMNode(editor, editor)
+    state.isUpdatingSelection = true
+
+    const newDomRange = selection &amp;&amp; ReactEditor.toDOMRange(editor, selection)
+
+    if (newDomRange) {
+      if (SlateRange.isBackward(selection!)) {
+        domSelection.setBaseAndExtent(
+          newDomRange.endContainer,
+          newDomRange.endOffset,
+          newDomRange.startContainer,
+          newDomRange.startOffset
+        )
+      } else {
+        domSelection.setBaseAndExtent(
+          newDomRange.startContainer,
+          newDomRange.startOffset,
+          newDomRange.endContainer,
+          newDomRange.endOffset
+        )
+      }
+      const leafEl = newDomRange.startContainer.parentElement!
+      scrollIntoView(leafEl, {
+        scrollMode: &#039;if-needed&#039;,
+        boundary: el,
+      })
+    } else {
+      domSelection.removeAllRanges()
+    }
+
+    setTimeout(() =&gt; {
+      // COMPAT: In Firefox, it&#039;s not enough to create a range, you also need
+      // to focus the contenteditable element too. (2016/11/16)
+      if (newDomRange &amp;&amp; IS_FIREFOX) {
+        el.focus()
+      }
+
+      state.isUpdatingSelection = false
+    })
+  })
+
+  // The autoFocus TextareaHTMLAttribute doesn&#039;t do anything on a div, so it
+  // needs to be manually focused.
+  useEffect(() =&gt; {
+    if (ref.current &amp;&amp; autoFocus) {
+      ref.current.focus()
+    }
+  }, [autoFocus])
+
+  // Listen on the native `beforeinput` event to get real &quot;Level 2&quot; events. This
+  // is required because React&#039;s `beforeinput` is fake and never really attaches
+  // to the real event sadly. (2019/11/01)
+  // https://github.com/facebook/react/issues/11211
+  const onDOMBeforeInput = useCallback(
+    (
+      event: Event &amp; {
+        data: string | null
+        dataTransfer: DataTransfer | null
+        getTargetRanges(): DOMStaticRange[]
+        inputType: string
+        isComposing: boolean
+      }
+    ) =&gt; {
+      if (
+        !readOnly &amp;&amp;
+        hasEditableTarget(editor, event.target) &amp;&amp;
+        !isDOMEventHandled(event, propsOnDOMBeforeInput)
+      ) {
+        const { selection } = editor
+        const { inputType: type } = event
+        const data = event.dataTransfer || event.data || undefined
+
+        // These two types occur while a user is composing text and can&#039;t be
+        // cancelled. Let them through and wait for the composition to end.
+        if (
+          type === &#039;insertCompositionText&#039; ||
+          type === &#039;deleteCompositionText&#039;
+        ) {
+          return
+        }
+
+        event.preventDefault()
+
+        // COMPAT: For the deleting forward/backward input types we don&#039;t want
+        // to change the selection because it is the range that will be deleted,
+        // and those commands determine that for themselves.
+        if (!type.startsWith(&#039;delete&#039;) || type.startsWith(&#039;deleteBy&#039;)) {
+          const [targetRange] = event.getTargetRanges()
+
+          if (targetRange) {
+            const range = ReactEditor.toSlateRange(editor, targetRange)
+
+            if (!selection || !SlateRange.equals(selection, range)) {
+              Transforms.select(editor, range)
+            }
+          }
+        }
+
+        // COMPAT: If the selection is expanded, even if the command seems like
+        // a delete forward/backward command it should delete the selection.
+        if (
+          selection &amp;&amp;
+          SlateRange.isExpanded(selection) &amp;&amp;
+          type.startsWith(&#039;delete&#039;)
+        ) {
+          Editor.deleteFragment(editor)
+          return
+        }
+
+        switch (type) {
+          case &#039;deleteByComposition&#039;:
+          case &#039;deleteByCut&#039;:
+          case &#039;deleteByDrag&#039;: {
+            Editor.deleteFragment(editor)
+            break
+          }
+
+          case &#039;deleteContent&#039;:
+          case &#039;deleteContentForward&#039;: {
+            Editor.deleteForward(editor)
+            break
+          }
+
+          case &#039;deleteContentBackward&#039;: {
+            Editor.deleteBackward(editor)
+            break
+          }
+
+          case &#039;deleteEntireSoftLine&#039;: {
+            Editor.deleteBackward(editor, { unit: &#039;line&#039; })
+            Editor.deleteForward(editor, { unit: &#039;line&#039; })
+            break
+          }
+
+          case &#039;deleteHardLineBackward&#039;: {
+            Editor.deleteBackward(editor, { unit: &#039;block&#039; })
+            break
+          }
+
+          case &#039;deleteSoftLineBackward&#039;: {
+            Editor.deleteBackward(editor, { unit: &#039;line&#039; })
+            break
+          }
+
+          case &#039;deleteHardLineForward&#039;: {
+            Editor.deleteForward(editor, { unit: &#039;block&#039; })
+            break
+          }
+
+          case &#039;deleteSoftLineForward&#039;: {
+            Editor.deleteForward(editor, { unit: &#039;line&#039; })
+            break
+          }
+
+          case &#039;deleteWordBackward&#039;: {
+            Editor.deleteBackward(editor, { unit: &#039;word&#039; })
+            break
+          }
+
+          case &#039;deleteWordForward&#039;: {
+            Editor.deleteForward(editor, { unit: &#039;word&#039; })
+            break
+          }
+
+          case &#039;insertLineBreak&#039;:
+          case &#039;insertParagraph&#039;: {
+            Editor.insertBreak(editor)
+            break
+          }
+
+          case &#039;insertFromComposition&#039;:
+          case &#039;insertFromDrop&#039;:
+          case &#039;insertFromPaste&#039;:
+          case &#039;insertFromYank&#039;:
+          case &#039;insertReplacementText&#039;:
+          case &#039;insertText&#039;: {
+            if (data instanceof DataTransfer) {
+              ReactEditor.insertData(editor, data)
+            } else if (typeof data === &#039;string&#039;) {
+              Editor.insertText(editor, data)
+            }
+
+            break
+          }
+        }
+      }
+    },
+    [readOnly, propsOnDOMBeforeInput]
+  )
+
+  // Attach a native DOM event handler for `beforeinput` events, because React&#039;s
+  // built-in `onBeforeInput` is actually a leaky polyfill that doesn&#039;t expose
+  // real `beforeinput` events sadly... (2019/11/04)
+  // https://github.com/facebook/react/issues/11211
+  useIsomorphicLayoutEffect(() =&gt; {
+    if (ref.current &amp;&amp; HAS_BEFORE_INPUT_SUPPORT) {
+      // @ts-ignore The `beforeinput` event isn&#039;t recognized.
+      ref.current.addEventListener(&#039;beforeinput&#039;, onDOMBeforeInput)
+    }
+
+    return () =&gt; {
+      if (ref.current &amp;&amp; HAS_BEFORE_INPUT_SUPPORT) {
+        // @ts-ignore The `beforeinput` event isn&#039;t recognized.
+        ref.current.removeEventListener(&#039;beforeinput&#039;, onDOMBeforeInput)
+      }
+    }
+  }, [onDOMBeforeInput])
+
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React&#039;s `onSelect` is leaky
+  // and non-standard so it doesn&#039;t fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
+  const onDOMSelectionChange = useCallback(
+    throttle(() =&gt; {
+      if (!readOnly &amp;&amp; !state.isComposing &amp;&amp; !state.isUpdatingSelection) {
+        const { activeElement } = window.document
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const domSelection = window.getSelection()
+
+        if (activeElement === el) {
+          state.latestElement = activeElement
+          IS_FOCUSED.set(editor, true)
+        } else {
+          IS_FOCUSED.delete(editor)
+        }
+
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideVoid(editor, focusNode)
+
+        if (anchorNodeSelectable &amp;&amp; focusNodeSelectable) {
+          const range = ReactEditor.toSlateRange(editor, domSelection)
+          Transforms.select(editor, range)
+        } else {
+          Transforms.deselect(editor)
+        }
+      }
+    }, 100),
+    [readOnly]
+  )
+
+  // Attach a native DOM event handler for `selectionchange`, because React&#039;s
+  // built-in `onSelect` handler doesn&#039;t fire for all selection changes. It&#039;s a
+  // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
+  // fire for any change to the selection inside the editor. (2019/11/04)
+  // https://github.com/facebook/react/issues/5785
+  useIsomorphicLayoutEffect(() =&gt; {
+    window.document.addEventListener(&#039;selectionchange&#039;, onDOMSelectionChange)
+
+    return () =&gt; {
+      window.document.removeEventListener(
+        &#039;selectionchange&#039;,
+        onDOMSelectionChange
+      )
+    }
+  }, [onDOMSelectionChange])
+
+  const decorations = decorate([editor, []])
+
+  if (
+    placeholder &amp;&amp;
+    editor.children.length === 1 &amp;&amp;
+    Array.from(SlateNode.texts(editor)).length === 1 &amp;&amp;
+    SlateNode.string(editor) === &#039;&#039;
+  ) {
+    const start = Editor.start(editor, [])
+    decorations.push({
+      [PLACEHOLDER_SYMBOL]: true,
+      placeholder,
+      anchor: start,
+      focus: start,
+    })
+  }
+
+  return (
+    &lt;ReadOnlyContext.Provider value={readOnly}&gt;
+      &lt;Component
+        // COMPAT: The Grammarly Chrome extension works by changing the DOM
+        // out from under `contenteditable` elements, which leads to weird
+        // behaviors so we have to disable it like editor. (2017/04/24)
+        data-gramm={false}
+        role={readOnly ? undefined : &#039;textbox&#039;}
+        {...attributes}
+        // COMPAT: Certain browsers don&#039;t support the `beforeinput` event, so we&#039;d
+        // have to use hacks to make these replacement-based features work.
+        spellCheck={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.spellCheck
+        }
+        autoCorrect={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCorrect
+        }
+        autoCapitalize={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCapitalize
+        }
+        data-slate-editor
+        data-slate-node=&quot;value&quot;
+        contentEditable={readOnly ? undefined : true}
+        suppressContentEditableWarning
+        ref={ref}
+        style={{
+          // Prevent the default outline styles.
+          outline: &#039;none&#039;,
+          // Preserve adjacent whitespace and new lines.
+          whiteSpace: &#039;pre-wrap&#039;,
+          // Allow words to break if they are too long.
+          wordWrap: &#039;break-word&#039;,
+          // Allow for passed-in styles to override anything.
+          ...style,
+        }}
+        onBeforeInput={useCallback(
+          (event: React.FormEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleBeforeInputEvent({
+              event,
+              editor,
+              HAS_BEFORE_INPUT_SUPPORT,
+              readOnly,
+              isEventHandled,
+              hasEditableTarget,
+              attributes,
+            })
+          },
+          [readOnly]
+        )}
+        onBlur={useCallback(
+          (event: React.FocusEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleOnBlurEvent({
+              event,
+              editor,
+              state,
+              readOnly,
+              hasEditableTarget,
+              isEventHandled,
+              isDOMElement,
+              isDOMNode,
+              attributes,
+              IS_FOCUSED,
+            })
+          },
+          [readOnly, attributes.onBlur]
+        )}
+        onClick={useCallback(
+          (event: React.MouseEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleClickEvent({
+              readOnly,
+              editor,
+              ReactEditor,
+              event,
+              isEventHandled,
+              hasTarget,
+              isDOMNode,
+              Editor,
+              Path,
+              Transforms,
+              attributes,
+            })
+          },
+          [readOnly, attributes.onClick]
+        )}
+        onCompositionEnd={useCallback(
+          (event: React.CompositionEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleCompositionEndEvent({
+              editor,
+              event,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              IS_SAFARI,
+              IS_FIREFOX,
+            })
+          },
+          [attributes.onCompositionEnd]
+        )}
+        onCompositionStart={useCallback(
+          (event: React.CompositionEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleCompositionStartEvent({
+              event,
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              state,
+            })
+          },
+          [attributes.onCompositionStart]
+        )}
+        onCopy={useCallback(
+          (event: React.ClipboardEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleCopyEvent({
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              event,
+            })
+          },
+          [attributes.onCopy]
+        )}
+        onCut={useCallback(
+          (event: React.ClipboardEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleCutEvent({
+              editor,
+              event,
+              readOnly,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+            })
+          },
+          [readOnly, attributes.onCut]
+        )}
+        onDragOver={useCallback(
+          (event: React.DragEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleDragOverEvent({
+              event,
+              editor,
+              hasTarget,
+              isEventHandled,
+              attributes,
+            })
+          },
+          [attributes.onDragOver]
+        )}
+        onDragStart={useCallback(
+          (event: React.DragEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleDragStartEvent({
+              event,
+              editor,
+              attributes,
+              hasTarget,
+              isEventHandled,
+            })
+          },
+          [attributes.onDragStart]
+        )}
+        onDrop={useCallback(
+          (event: React.DragEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleDropEvent({
+              editor,
+              event,
+              hasTarget,
+              isEventHandled,
+              readOnly,
+              attributes,
+              HAS_BEFORE_INPUT_SUPPORT,
+              IS_SAFARI,
+            })
+          },
+          [readOnly, attributes.onDrop]
+        )}
+        onFocus={useCallback(
+          (event: React.FocusEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleOnFocusEvent({
+              event,
+              editor,
+              readOnly,
+              state,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              IS_FIREFOX,
+              IS_FOCUSED,
+            })
+          },
+          [readOnly, attributes.onFocus]
+        )}
+        onKeyDown={useCallback(
+          (event: React.KeyboardEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handleKeyDownEvent({
+              editor,
+              hasEditableTarget,
+              isEventHandled,
+              attributes,
+              event,
+              HAS_BEFORE_INPUT_SUPPORT,
+            })
+          },
+          [readOnly, attributes.onKeyDown]
+        )}
+        onPaste={useCallback(
+          (event: React.ClipboardEvent&lt;HTMLDivElement&gt;) =&gt; {
+            handlePasteEvent({
+              editor,
+              event,
+              hasEditableTarget,
+              isEventHandled,
+              isPlainTextOnlyPaste,
+              HAS_BEFORE_INPUT_SUPPORT,
+              readOnly,
+              attributes,
+            })
+          },
+          [readOnly, attributes.onPaste]
+        )}
+      &gt;
+        &lt;Children
+          decorate={decorate}
+          decorations={decorations}
+          node={editor}
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          selection={editor.selection}
+        /&gt;
+      &lt;/Component&gt;
+    &lt;/ReadOnlyContext.Provider&gt;
+  )
+}
+
+/**
+ * A default memoized decorate function.
+ */
+
+const defaultDecorate = () =&gt; []
+
+/**
+ * Check if two DOM range objects are equal.
+ */
+
+const isRangeEqual = (a: DOMRange, b: DOMRange) =&gt; {
+  return (
+    (a.startContainer === b.startContainer &amp;&amp;
+      a.startOffset === b.startOffset &amp;&amp;
+      a.endContainer === b.endContainer &amp;&amp;
+      a.endOffset === b.endOffset) ||
+    (a.startContainer === b.endContainer &amp;&amp;
+      a.startOffset === b.endOffset &amp;&amp;
+      a.endContainer === b.startContainer &amp;&amp;
+      a.endOffset === b.startOffset)
+  )
+}
+
+/**
+ * Check if the target is in the editor.
+ */
+
+const hasTarget = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): target is DOMNode =&gt; {
+  return isDOMNode(target) &amp;&amp; ReactEditor.hasDOMNode(editor, target)
+}
+
+/**
+ * Check if the target is editable and in the editor.
+ */
+
+const hasEditableTarget = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): target is DOMNode =&gt; {
+  return (
+    isDOMNode(target) &amp;&amp;
+    ReactEditor.hasDOMNode(editor, target, { editable: true })
+  )
+}
+
+/**
+ * Check if the target is inside void and in the editor.
+ */
+
+const isTargetInsideVoid = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): boolean =&gt; {
+  const slateNode =
+    hasTarget(editor, target) &amp;&amp; ReactEditor.toSlateNode(editor, target)
+  return Editor.isVoid(editor, slateNode)
+}
+
+/**
+ * Check if an event is overrided by a handler.
+ */
+
+const isEventHandled = &lt;
+  EventType extends React.SyntheticEvent&lt;unknown, unknown&gt;
+&gt;(
+  event: EventType,
+  handler?: (event: EventType) =&gt; void
+) =&gt; {
+  if (!handler) {
+    return false
+  }
+
+  handler(event)
+  return event.isDefaultPrevented() || event.isPropagationStopped()
+}
+
+/**
+ * Check if a DOM event is overrided by a handler.
+ */
+
+const isDOMEventHandled = (event: Event, handler?: (event: Event) =&gt; void) =&gt; {
+  if (!handler) {
+    return false
+  }
+
+  handler(event)
+  return event.defaultPrevented
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

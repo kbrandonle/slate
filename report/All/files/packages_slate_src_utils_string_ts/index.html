@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - packages/slate/src/utils/string.ts</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="https://github.com/the-simian/es6-plato">ES6 Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+      <li class="active">
+        <a href="display.html">Summary Display</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>packages/slate/src/utils/string.ts</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">54.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">201</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">39.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.86</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Constants for string distance checking.
+ */
+
+const SPACE = /\s/
+const PUNCTUATION = /[\u0021-\u0023\u0025-\u002A\u002C-\u002F\u003A\u003B\u003F\u0040\u005B-\u005D\u005F\u007B\u007D\u00A1\u00A7\u00AB\u00B6\u00B7\u00BB\u00BF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u0AF0\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166D\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E3B\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]/
+const CHAMELEON = /[&#039;\u2018\u2019]/
+const SURROGATE_START = 0xd800
+const SURROGATE_END = 0xdfff
+const ZERO_WIDTH_JOINER = 0x200d
+
+/**
+ * Get the distance to the end of the first character in a string of text.
+ */
+
+export const getCharacterDistance = (text: string): number =&gt; {
+  let offset = 0
+  // prev types:
+  // SURR: surrogate pair
+  // MOD: modifier (technically also surrogate pair)
+  // ZWJ: zero width joiner
+  // VAR: variation selector
+  // BMP: sequenceable character from basic multilingual plane
+  let prev: &#039;SURR&#039; | &#039;MOD&#039; | &#039;ZWJ&#039; | &#039;VAR&#039; | &#039;BMP&#039; | null = null
+  let charCode = text.charCodeAt(0)
+
+  while (charCode) {
+    if (isSurrogate(charCode)) {
+      const modifier = isModifier(charCode, text, offset)
+
+      // Early returns are the heart of this function, where we decide if previous and current
+      // codepoints should form a single character (in terms of how many of them should selection
+      // jump over).
+      if (prev === &#039;SURR&#039; || prev === &#039;BMP&#039;) {
+        break
+      }
+
+      offset += 2
+      prev = modifier ? &#039;MOD&#039; : &#039;SURR&#039;
+      charCode = text.charCodeAt(offset)
+      // Absolutely fine to `continue` without any checks because if `charCode` is NaN (which
+      // is the case when out of `text` range), next `while` loop won&quot;t execute and we&quot;re done.
+      continue
+    }
+
+    if (charCode === ZERO_WIDTH_JOINER) {
+      offset += 1
+      prev = &#039;ZWJ&#039;
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isBMPEmoji(charCode)) {
+      if (prev &amp;&amp; prev !== &#039;ZWJ&#039; &amp;&amp; prev !== &#039;VAR&#039;) {
+        break
+      }
+      offset += 1
+      prev = &#039;BMP&#039;
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isVariationSelector(charCode)) {
+      if (prev &amp;&amp; prev !== &#039;ZWJ&#039;) {
+        break
+      }
+      offset += 1
+      prev = &#039;VAR&#039;
+      charCode = text.charCodeAt(offset)
+      continue
+    }
+
+    // Modifier &#039;groups up&#039; with what ever character is before that (even whitespace), need to
+    // look ahead.
+    if (prev === &#039;MOD&#039;) {
+      offset += 1
+      break
+    }
+
+    // If while loop ever gets here, we&#039;re done (e.g latin chars).
+    break
+  }
+
+  return offset || 1
+}
+
+/**
+ * Get the distance to the end of the first word in a string of text.
+ */
+
+export const getWordDistance = (text: string): number =&gt; {
+  let length = 0
+  let i = 0
+  let started = false
+  let char
+
+  while ((char = text.charAt(i))) {
+    const l = getCharacterDistance(char)
+    char = text.slice(i, i + l)
+    const rest = text.slice(i + l)
+
+    if (isWordCharacter(char, rest)) {
+      started = true
+      length += l
+    } else if (!started) {
+      length += l
+    } else {
+      break
+    }
+
+    i += l
+  }
+
+  return length
+}
+
+/**
+ * Check if a character is a word character. The `remaining` argument is used
+ * because sometimes you must read subsequent characters to truly determine it.
+ */
+
+const isWordCharacter = (char: string, remaining: string): boolean =&gt; {
+  if (SPACE.test(char)) {
+    return false
+  }
+
+  // Chameleons count as word characters as long as they&#039;re in a word, so
+  // recurse to see if the next one is a word character or not.
+  if (CHAMELEON.test(char)) {
+    let next = remaining.charAt(0)
+    const length = getCharacterDistance(next)
+    next = remaining.slice(0, length)
+    const rest = remaining.slice(length)
+
+    if (isWordCharacter(next, rest)) {
+      return true
+    }
+  }
+
+  if (PUNCTUATION.test(char)) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Determines if `code` is a surrogate
+ */
+
+const isSurrogate = (code: number): boolean =&gt;
+  SURROGATE_START &lt;= code &amp;&amp; code &lt;= SURROGATE_END
+
+/**
+ * Does `code` form Modifier with next one.
+ *
+ * https://emojipedia.org/modifiers/
+ */
+
+const isModifier = (code: number, text: string, offset: number): boolean =&gt; {
+  if (code === 0xd83c) {
+    const next = text.charCodeAt(offset + 1)
+    return next &lt;= 0xdfff &amp;&amp; next &gt;= 0xdffb
+  }
+  return false
+}
+
+/**
+ * Is `code` a Variation Selector.
+ *
+ * https://codepoints.net/variation_selectors
+ */
+
+const isVariationSelector = (code: number): boolean =&gt; {
+  return code &lt;= 0xfe0f &amp;&amp; code &gt;= 0xfe00
+}
+
+/**
+ * Is `code` one of the BMP codes used in emoji sequences.
+ *
+ * https://emojipedia.org/emoji-zwj-sequences/
+ */
+
+const isBMPEmoji = (code: number): boolean =&gt; {
+  // This requires tiny bit of maintanance, better ideas?
+  // Fortunately it only happens if new Unicode Standard
+  // is released. Fails gracefully if upkeep lags behind,
+  // same way Slate previously behaved with all emojis.
+  return (
+    code === 0x2764 || // heart (❤)
+    code === 0x2642 || // male (♂)
+    code === 0x2640 || // female (♀)
+    code === 0x2620 || // scull (☠)
+    code === 0x2695 || // medical (⚕)
+    code === 0x2708 || // plane (✈️)
+    code === 0x25ef // large circle (◯)
+  )
+}
+</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
