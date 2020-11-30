@@ -94,7 +94,19 @@ describe('slate-react', () => {
 
     expect(getSelectionEditor().selection).toEqual(output) // selection should equal output selection
   })
+  // for each type of key event for the editor, run a key press
+  // simulation to match the correct hotkeys with their corresponding event
   fixtures(__dirname, 'key-event', ({ module }) => {
+    const { event, output } = module
+
+    functionArray.map((hotkeyFunction, index) => {
+      act(() => {
+        expect(hotkeyFunction(event)).toEqual(output[index])
+      })
+    })
+  })
+  // does the same thing as the key events above but for mac keys instead
+  fixtures(__dirname, 'mac-key-event', ({ module }) => {
     const { event, output } = module
 
     functionArray.map((hotkeyFunction, index) => {
